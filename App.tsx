@@ -1,26 +1,22 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {
-  SafeAreaView,
-  StatusBar,
-  useColorScheme,
-  ActivityIndicator,
-  View,
-} from 'react-native';
+import {StatusBar, useColorScheme, ActivityIndicator, View} from 'react-native';
+import TrackPlayer from 'react-native-track-player';
 
 import data from './src/data/index';
-import TrackPlayer from 'react-native-track-player';
-import {PlayerControls} from './src/components/player-controls';
-import {PlayerList} from './src/screens/player';
-import {BottomControls} from './src/components/bottom-controls';
-import {Colors, Theme, getColors} from './src/style/colors';
+import {Theme} from './src/style/colors';
+import {TabNavigation} from './src/navigation';
+import {NavigationContainer} from '@react-navigation/native';
 import {SwipableModal} from './src/components/swipable-modal';
+import {PlayerControls} from './src/components/player-controls';
+import {appObserver} from './src/state-management/utils';
+import {playerModalState} from './src/state-management';
 
-function App(): JSX.Element {
+const App = appObserver((): JSX.Element => {
   const theme = useColorScheme();
 
   const [appInit, setAppInit] = useState(true);
 
-  const [isOpenPlayerModal, setPlayerModal] = useState(false);
+  const closeModal = useCallback(() => playerModalState.closeModal(), []);
 
   useEffect(() => {
     setupPlayer();
@@ -41,10 +37,6 @@ function App(): JSX.Element {
     setAppInit(false);
   }, []);
 
-  const openModal = useCallback(() => setPlayerModal(true), []);
-
-  const closeModal = useCallback(() => setPlayerModal(false), []);
-
   if (appInit) {
     return (
       // eslint-disable-next-line react-native/no-inline-styles
@@ -55,29 +47,22 @@ function App(): JSX.Element {
   }
 
   return (
-    <>
-      <SafeAreaView
-        // eslint-disable-next-line react-native/no-inline-styles
-        style={{
-          flex: 1,
-          backgroundColor: getColors(theme, Colors.background),
-        }}>
-        <StatusBar
-          barStyle={theme === Theme.dark ? 'light-content' : 'dark-content'}
+    <NavigationContainer>
+      <StatusBar
+        barStyle={theme === Theme.dark ? 'light-content' : 'dark-content'}
+      />
+      <TabNavigation />
+      <SwipableModal
+        isVisible={playerModalState.isOpen}
+        closeModal={closeModal}>
+        <PlayerControls
+          theme={theme}
+          isVisible={playerModalState.isOpen}
+          onClose={closeModal}
         />
-
-        <PlayerList />
-        <SwipableModal isVisible={isOpenPlayerModal} closeModal={closeModal}>
-          <PlayerControls
-            theme={theme}
-            isVisible={isOpenPlayerModal}
-            onClose={closeModal}
-          />
-        </SwipableModal>
-      </SafeAreaView>
-      <BottomControls openModal={openModal} />
-    </>
+      </SwipableModal>
+    </NavigationContainer>
   );
-}
+});
 
 export default App;

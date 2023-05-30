@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useRef, useState} from 'react';
+import React, {FC, useEffect, useRef, useState, useCallback} from 'react';
 import {
   GestureResponderEvent,
   Image,
@@ -13,6 +13,8 @@ import TrackPlayer, {
 } from 'react-native-track-player';
 import * as Animatable from 'react-native-animatable';
 
+import {playerModalState} from '../../state-management';
+import {appObserver} from '../../state-management/utils';
 import {TrackProgress} from '../track-progress';
 import {Colors, getColors} from '../../style/colors';
 import {TrackType} from '../../data/types';
@@ -20,11 +22,7 @@ import {Icon} from '../icon';
 
 import {styles} from './bottom-controls.styles';
 
-type BottomControlsProps = {
-  openModal: () => void;
-};
-
-export const BottomControls: FC<BottomControlsProps> = ({openModal}) => {
+export const BottomControls: FC<{}> = appObserver(({}) => {
   const touchX = useRef(0);
 
   const theme = useColorScheme();
@@ -34,6 +32,8 @@ export const BottomControls: FC<BottomControlsProps> = ({openModal}) => {
   const [trackInfo, setTrackInfo] = useState<TrackType | undefined>(undefined);
 
   const animatableTitle = useRef<Animatable.View & View>(null);
+
+  const openModal = useCallback(() => playerModalState.openModel(), []);
 
   useEffect(() => {
     TrackPlayer.getCurrentTrack().then(async track => {
@@ -195,4 +195,4 @@ export const BottomControls: FC<BottomControlsProps> = ({openModal}) => {
       </View>
     </Animatable.View>
   );
-};
+});

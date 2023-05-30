@@ -1,12 +1,12 @@
 import {Dimensions, StyleSheet} from 'react-native';
 
-const bottomControlsHeight = 80;
+const bottomControlsHeight = 50;
 
 export const styles = StyleSheet.create({
   container: {
     width: Dimensions.get('window').width,
     height: bottomControlsHeight,
-    paddingTop: 6,
+    justifyContent: 'center',
   },
   wrapper: {
     paddingHorizontal: 8,

@@ -6,6 +6,8 @@ import {TrackType} from '../../data/types';
 
 import {ListItem} from './components/list-item';
 
+import {styles} from './player.styles';
+
 type PlayerProps = {};
 
 export const PlayerList: FC<PlayerProps> = () => {
@@ -34,6 +36,7 @@ export const PlayerList: FC<PlayerProps> = () => {
 
   return (
     <FlatList
+      contentContainerStyle={styles.contentContainerStyle}
       data={trackList}
       keyExtractor={keyExtractor}
       renderItem={renderItem}
