@@ -10,6 +10,7 @@ import {SwipableModal} from './src/components/swipable-modal';
 import {PlayerControls} from './src/components/player-controls';
 import {appObserver} from './src/state-management/utils';
 import {playerModalState} from './src/state-management';
+import {Storage} from './src/services/storage';
 
 const App = appObserver((): JSX.Element => {
   const theme = useColorScheme();
@@ -33,7 +34,18 @@ const App = appObserver((): JSX.Element => {
     }
   };
 
-  const finishInitialization = useCallback(() => {
+  const finishInitialization = useCallback(async () => {
+    const lastTrackId = Storage.getInt(Storage.storageNames.lastTrackId);
+
+    if (lastTrackId) {
+      const position = (await TrackPlayer.getQueue()).findIndex(
+        el => el.id === lastTrackId,
+      );
+
+      if (position) {
+        TrackPlayer.skip(position);
+      }
+    }
     setAppInit(false);
   }, []);
 

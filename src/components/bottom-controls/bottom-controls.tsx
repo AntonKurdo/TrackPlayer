@@ -13,6 +13,7 @@ import TrackPlayer, {
 } from 'react-native-track-player';
 import * as Animatable from 'react-native-animatable';
 
+import {Storage} from '../../services/storage';
 import {playerModalState} from '../../state-management';
 import {appObserver} from '../../state-management/utils';
 import {TrackProgress} from '../track-progress';
@@ -58,6 +59,7 @@ export const BottomControls: FC<{}> = appObserver(({}) => {
 
         if (track) {
           setTrackInfo(track as TrackType);
+          Storage.setInt(Storage.storageNames.lastTrackId, track.id);
         }
       }
       if (event.type === Event.PlaybackState && event.state === State.Playing) {
