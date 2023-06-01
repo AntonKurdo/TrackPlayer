@@ -1,4 +1,4 @@
-import {Dimensions, StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
@@ -11,13 +11,12 @@ export const styles = StyleSheet.create({
     borderTopStartRadius: 16,
   },
   coverWrapper: {
-    paddingVertical: 8,
-    width: Dimensions.get('window').width,
     alignItems: 'center',
     marginBottom: 16,
+    borderRadius: 8,
+    overflow: 'hidden',
   },
   cover: {
-    borderRadius: 8,
     width: 250,
     height: 250,
   },
