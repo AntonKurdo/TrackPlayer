@@ -12,10 +12,12 @@ export const Main = () => {
   const theme = useColorScheme();
 
   const [trackList, setTrackList] = useState<TrackType[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     TrackPlayer.getQueue().then(tracks => {
       setTrackList(tracks as TrackType[]);
+      setLoading(false);
     });
   }, []);
 
@@ -27,7 +29,7 @@ export const Main = () => {
           backgroundColor: getColors(theme, Colors.background),
         },
       ]}>
-      <PlayerList data={trackList} />
+      <PlayerList loading={loading} data={trackList} />
     </SafeAreaView>
   );
 };

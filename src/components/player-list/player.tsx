@@ -1,17 +1,19 @@
 import React, {FC, useCallback} from 'react';
-import {FlatList} from 'react-native';
+import {ActivityIndicator, FlatList, View} from 'react-native';
 
 import {TrackType} from '../../data/types';
 
 import {ListItem} from './components/list-item';
+import {EmptyList} from '../empty-list';
 
 import {styles} from './player.styles';
 
 type PlayerProps = {
   data: TrackType[];
+  loading?: boolean;
 };
 
-export const PlayerList: FC<PlayerProps> = ({data}) => {
+export const PlayerList: FC<PlayerProps> = ({data, loading}) => {
   const keyExtractor = useCallback((item: TrackType) => item.id.toString(), []);
 
   const renderItem = useCallback(
@@ -27,8 +29,18 @@ export const PlayerList: FC<PlayerProps> = ({data}) => {
     [data.length],
   );
 
+  if (loading) {
+    return (
+      <View style={styles.loadingStyles}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
   return (
     <FlatList
+      scrollEnabled={!!data.length}
+      ListEmptyComponent={EmptyList}
       contentContainerStyle={styles.contentContainerStyle}
       data={data}
       keyExtractor={keyExtractor}
