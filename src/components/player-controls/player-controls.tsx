@@ -21,6 +21,7 @@ import {TrackProgress} from '../track-progress';
 import {Icon} from '../icon';
 import {checkPostionOfTrack} from './utils';
 import {appObserver} from '../../state-management/utils';
+import {favouritesListState} from '../../state-management';
 
 import {styles} from './player-controls.styles';
 
@@ -140,14 +141,14 @@ export const PlayerControls: FC<PlayerControlsType> = appObserver(
           await TrackPlayer.setRepeatMode(RepeatMode.Track);
           setRepeatMode(RepeatMode.Track);
         } catch (error) {
-          console.log({error});
+          console.error({error});
         }
       } else {
         try {
           await TrackPlayer.setRepeatMode(RepeatMode.Off);
           setRepeatMode(RepeatMode.Off);
         } catch (error) {
-          console.log({error});
+          console.error({error});
         }
       }
     }, [repeatMode]);
@@ -182,6 +183,18 @@ export const PlayerControls: FC<PlayerControlsType> = appObserver(
         console.error({error});
       }
     };
+
+    const favouritesHandler = useCallback(() => {
+      if (!trackInfo?.id) {
+        return;
+      }
+
+      if (favouritesListState.list.find(el => el.id === trackInfo.id)) {
+        favouritesListState.removeTrackFromFavourites(trackInfo.id);
+      } else {
+        favouritesListState.addTrackToFavourites(trackInfo);
+      }
+    }, [trackInfo]);
 
     return (
       <View
@@ -298,7 +311,27 @@ export const PlayerControls: FC<PlayerControlsType> = appObserver(
                 }
                 onPress={skipToNext}
               />
+              <IconButton
+                containerStyle={styles.likeButton}
+                icon={
+                  <Icon
+                    name={
+                      favouritesListState.list.find(
+                        el => el.id === trackInfo.id,
+                      )
+                        ? 'heart'
+                        : 'hearto'
+                    }
+                    size={20}
+                    color={
+                      isNextDisabled ? 'gray' : getColors(theme, Colors.button)
+                    }
+                  />
+                }
+                onPress={favouritesHandler}
+              />
             </View>
+
             <TrackProgress />
           </>
         )}

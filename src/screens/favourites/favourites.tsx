@@ -1,21 +1,25 @@
 import React from 'react';
-import {View, Text, useColorScheme} from 'react-native';
+import {SafeAreaView, useColorScheme} from 'react-native';
+
+import {PlayerList} from '../../components/player-list';
+import {Colors, getColors} from '../../style/colors';
+import {favouritesListState} from '../../state-management';
+import {appObserver} from '../../state-management/utils';
 
 import {styles} from './favourites.styles';
-import {Colors, getColors} from '../../style/colors';
 
-export const Favourites = () => {
+export const Favourites = appObserver(() => {
   const theme = useColorScheme();
 
   return (
-    <View
+    <SafeAreaView
       style={[
         styles.container,
         {
           backgroundColor: getColors(theme, Colors.background),
         },
       ]}>
-      <Text>Hello</Text>
-    </View>
+      <PlayerList data={favouritesListState.list} />
+    </SafeAreaView>
   );
-};
+});

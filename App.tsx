@@ -35,7 +35,7 @@ const App = appObserver((): JSX.Element => {
   };
 
   const finishInitialization = useCallback(async () => {
-    const lastTrackId = Storage.getInt(Storage.storageNames.lastTrackId);
+    const lastTrackId = Storage.getInt(Storage.storageKeys.lastTrackId);
 
     if (lastTrackId) {
       const position = (await TrackPlayer.getQueue()).findIndex(

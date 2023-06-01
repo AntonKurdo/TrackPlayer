@@ -29,6 +29,9 @@ export const styles = StyleSheet.create({
     fontSize: 12,
   },
   controlWrapper: {
+    justifyContent: 'center',
+    width: '100%',
+
     marginTop: 16,
     flexDirection: 'row',
     alignItems: 'center',
@@ -42,5 +45,9 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     left: 20,
+  },
+  likeButton: {
+    position: 'absolute',
+    right: 0,
   },
 });

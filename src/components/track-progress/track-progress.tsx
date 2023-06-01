@@ -55,7 +55,6 @@ export const TrackProgress: FC<Props> = ({
     <View style={[styles.container, containerStyles]}>
       {withTime && (
         <Text
-          // eslint-disable-next-line react-native/no-inline-styles
           style={[
             styles.time,
             // eslint-disable-next-line react-native/no-inline-styles
@@ -66,6 +65,8 @@ export const TrackProgress: FC<Props> = ({
       )}
 
       <Slider
+        animateTransitions
+        animationType="timing"
         containerStyle={{...styles.sliderStyle, ...sliderStyles}}
         minimumValue={0}
         maximumValue={progress.duration}

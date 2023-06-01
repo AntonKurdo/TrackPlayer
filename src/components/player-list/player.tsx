@@ -1,6 +1,5 @@
-import React, {FC, useCallback, useEffect, useState} from 'react';
+import React, {FC, useCallback} from 'react';
 import {FlatList} from 'react-native';
-import TrackPlayer from 'react-native-track-player';
 
 import {TrackType} from '../../data/types';
 
@@ -8,17 +7,11 @@ import {ListItem} from './components/list-item';
 
 import {styles} from './player.styles';
 
-type PlayerProps = {};
+type PlayerProps = {
+  data: TrackType[];
+};
 
-export const PlayerList: FC<PlayerProps> = () => {
-  const [trackList, setTrackList] = useState<TrackType[]>([]);
-
-  useEffect(() => {
-    TrackPlayer.getQueue().then(tracks => {
-      setTrackList(tracks as TrackType[]);
-    });
-  }, []);
-
+export const PlayerList: FC<PlayerProps> = ({data}) => {
   const keyExtractor = useCallback((item: TrackType) => item.id.toString(), []);
 
   const renderItem = useCallback(
@@ -27,17 +20,17 @@ export const PlayerList: FC<PlayerProps> = () => {
         <ListItem
           track={item}
           index={index}
-          isLast={index === trackList.length - 1}
+          isLast={index === data.length - 1}
         />
       );
     },
-    [trackList.length],
+    [data.length],
   );
 
   return (
     <FlatList
       contentContainerStyle={styles.contentContainerStyle}
-      data={trackList}
+      data={data}
       keyExtractor={keyExtractor}
       renderItem={renderItem}
     />

@@ -59,7 +59,7 @@ export const BottomControls: FC<{}> = appObserver(({}) => {
 
         if (track) {
           setTrackInfo(track as TrackType);
-          Storage.setInt(Storage.storageNames.lastTrackId, track.id);
+          Storage.setInt(Storage.storageKeys.lastTrackId, track.id);
         }
       }
       if (event.type === Event.PlaybackState && event.state === State.Playing) {

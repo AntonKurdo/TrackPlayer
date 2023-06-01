@@ -1,4 +1,4 @@
-import React, {FC, useCallback, useState} from 'react';
+import React, {FC, useCallback, useEffect, useState} from 'react';
 import {
   View,
   Image,
@@ -26,18 +26,39 @@ type ListItemProps = {
   isLast: boolean;
 };
 
-export const ListItem: FC<ListItemProps> = ({track, index, isLast}) => {
+export const ListItem: FC<ListItemProps> = ({track, isLast}) => {
   const theme = useColorScheme();
 
   const [playedNow, setPlayedNow] = useState(false);
+
+  useEffect(() => {
+    checkIfPlayingWhileInitialization();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const checkIfPlayingWhileInitialization = useCallback(async () => {
+    const isPlaying = (await TrackPlayer.getState()) === State.Playing;
+
+    if (isPlaying) {
+      const currentTrack = await TrackPlayer.getCurrentTrack();
+      const currentQueue = await TrackPlayer.getQueue();
+
+      const isCurrentTrack = currentQueue[currentTrack!].id === track.id;
+
+      setPlayedNow(isCurrentTrack);
+    }
+  }, [track.id]);
 
   useTrackPlayerEvents(
     [Event.PlaybackTrackChanged, Event.PlaybackState],
     async event => {
       const currentTrack = await TrackPlayer.getCurrentTrack();
+      const currentQueue = await TrackPlayer.getQueue();
+
+      const isCurrentTrack = currentQueue[currentTrack!].id === track.id;
 
       if (event.type === Event.PlaybackState && event.state === State.Playing) {
-        if (currentTrack === index) {
+        if (isCurrentTrack) {
           setPlayedNow(event.state === State.Playing);
         } else {
           setPlayedNow(false);
@@ -46,7 +67,7 @@ export const ListItem: FC<ListItemProps> = ({track, index, isLast}) => {
       if (
         event.type === Event.PlaybackState &&
         event.state === State.Paused &&
-        currentTrack === index
+        isCurrentTrack
       ) {
         setPlayedNow(false);
       }
@@ -54,20 +75,27 @@ export const ListItem: FC<ListItemProps> = ({track, index, isLast}) => {
   );
 
   const onPressHandler = useCallback(async () => {
-    const currentTrack = await TrackPlayer.getCurrentTrack();
-    const currentState = await TrackPlayer.getState();
+    try {
+      const currentTrack = await TrackPlayer.getCurrentTrack();
 
-    if (currentTrack === index) {
-      if (currentState !== State.Playing) {
-        TrackPlayer.play();
+      const currentQueue = await TrackPlayer.getQueue();
+
+      const currentState = await TrackPlayer.getState();
+
+      if (currentQueue[currentTrack!].id === track.id) {
+        if (currentState !== State.Playing) {
+          TrackPlayer.play();
+        } else {
+          TrackPlayer.pause();
+        }
       } else {
-        TrackPlayer.pause();
+        TrackPlayer.skip(currentQueue.findIndex(t => t.id === track.id));
+        TrackPlayer.play();
       }
-    } else {
-      TrackPlayer.skip(index);
-      TrackPlayer.play();
+    } catch (error) {
+      console.error(error);
     }
-  }, [index]);
+  }, [track.id]);
 
   return (
     <TouchableOpacity

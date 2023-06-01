@@ -3,16 +3,17 @@ import {MMKVLoader} from 'react-native-mmkv-storage';
 class StorageService {
   private storage;
 
-  private _storageNames = {
+  private _storageKeys = {
     lastTrackId: 'lastTrackId',
+    favouritesList: 'favouritesList',
   };
 
   constructor() {
     this.storage = new MMKVLoader().initialize();
   }
 
-  get storageNames() {
-    return this._storageNames;
+  get storageKeys() {
+    return this._storageKeys;
   }
 
   setInt = (name: string, value: number) => {
@@ -21,6 +22,14 @@ class StorageService {
 
   getInt = (name: string) => {
     return this.storage.getInt(name);
+  };
+
+  setArray = <T>(name: string, value: T[]) => {
+    return this.storage.setArray(name, value);
+  };
+
+  getArray = <T>(name: string): T[] => {
+    return this.storage.getArray(name);
   };
 
   clearAll = () => {
