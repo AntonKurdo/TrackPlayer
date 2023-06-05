@@ -12,10 +12,17 @@ type Props = {
   closeModal: () => void;
   children: React.ReactNode;
   propagateSwipe?: boolean;
+  useNativeDriverForBackdrop?: boolean;
 };
 
 export const SwipableModal: FC<Props> = appObserver(
-  ({isVisible, closeModal, propagateSwipe, children}) => {
+  ({
+    isVisible,
+    closeModal,
+    propagateSwipe,
+    useNativeDriverForBackdrop,
+    children,
+  }) => {
     const theme = useColorScheme();
 
     return (
@@ -26,6 +33,7 @@ export const SwipableModal: FC<Props> = appObserver(
         isVisible={isVisible}
         swipeThreshold={200}
         onSwipeComplete={closeModal}
+        useNativeDriverForBackdrop={useNativeDriverForBackdrop}
         hideModalContentWhileAnimating={true}
         swipeDirection="down">
         <View style={[styles.wrapper]}>{children}</View>

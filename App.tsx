@@ -79,6 +79,7 @@ const App = appObserver((): JSX.Element => {
         <TabNavigation />
         <SwipableModal
           propagateSwipe
+          useNativeDriverForBackdrop
           isVisible={playerModalState.isOpen}
           closeModal={closeModal}>
           <PlayerControls
