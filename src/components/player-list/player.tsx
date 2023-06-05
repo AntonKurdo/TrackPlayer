@@ -11,9 +11,10 @@ import {styles} from './player.styles';
 type PlayerProps = {
   data: TrackType[];
   loading?: boolean;
+  withSweapable?: boolean;
 };
 
-export const PlayerList: FC<PlayerProps> = ({data, loading}) => {
+export const PlayerList: FC<PlayerProps> = ({data, loading, withSweapable}) => {
   const keyExtractor = useCallback((item: TrackType) => item.id.toString(), []);
 
   const renderItem = useCallback(
@@ -23,10 +24,11 @@ export const PlayerList: FC<PlayerProps> = ({data, loading}) => {
           track={item}
           index={index}
           isLast={index === data.length - 1}
+          withSweapable={withSweapable}
         />
       );
     },
-    [data.length],
+    [data.length, withSweapable],
   );
 
   if (loading) {

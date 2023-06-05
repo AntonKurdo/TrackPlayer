@@ -10,7 +10,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import TrackPlayer from 'react-native-track-player';
 
 import data from './src/data/index';
-import {Theme} from './src/style/colors';
+import {Colors, Theme, getColors} from './src/style/colors';
 import {TabNavigation} from './src/navigation';
 import {NavigationContainer} from '@react-navigation/native';
 import {SwipableModal} from './src/components/swipable-modal';
@@ -64,7 +64,10 @@ const App = appObserver((): JSX.Element => {
     return (
       // eslint-disable-next-line react-native/no-inline-styles
       <View style={{flex: 1, justifyContent: 'center'}}>
-        <ActivityIndicator size={'large'} />
+        <ActivityIndicator
+          size={'large'}
+          color={getColors(theme, Colors.yellow)}
+        />
       </View>
     );
   }

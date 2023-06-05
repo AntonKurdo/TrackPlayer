@@ -19,7 +19,7 @@ export const Favourites = appObserver(() => {
           backgroundColor: getColors(theme, Colors.background),
         },
       ]}>
-      <PlayerList data={favouritesListState.list} />
+      <PlayerList withSweapable data={favouritesListState.list} />
     </SafeAreaView>
   );
 });

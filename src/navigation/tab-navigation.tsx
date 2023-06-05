@@ -18,6 +18,8 @@ import {Main} from '../screens/main';
 import {Favourites} from '../screens/favourites';
 import {Icon, IconType} from '../components/icon';
 import {routes} from './routes';
+import {appObserver} from '../state-management/utils';
+import {favouritesListState} from '../state-management';
 
 import {Colors, getColors} from '../style/colors';
 
@@ -29,6 +31,7 @@ type ControlType = {
     activeIconName: string;
     inactiveIconName: string;
   };
+  withFavouritesBadge?: boolean;
 };
 
 const controls: ControlType[] = [
@@ -49,6 +52,7 @@ const controls: ControlType[] = [
       activeIconName: 'favorite',
       inactiveIconName: 'favorite-outline',
     },
+    withFavouritesBadge: true,
   },
 ];
 
@@ -99,48 +103,68 @@ const TabBar = ({
   );
 };
 
-const TabBarControl = ({
-  c,
-  isActive,
-  onPress,
-}: {
-  c: ControlType;
-  isActive: boolean;
-  onPress: () => void;
-}) => {
-  const theme = useColorScheme();
+const TabBarControl = appObserver(
+  ({
+    c,
+    isActive,
+    onPress,
+  }: {
+    c: ControlType;
+    isActive: boolean;
+    onPress: () => void;
+  }) => {
+    const theme = useColorScheme();
 
-  return (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      onPress={onPress}
-      style={styles.controlWrapper}>
-      <Icon
-        size={25}
-        type={c.iconProps.type}
-        name={
-          isActive ? c.iconProps.activeIconName : c.iconProps.inactiveIconName
-        }
-        color={
-          isActive
-            ? getColors(theme, Colors.yellow)
-            : getColors(theme, Colors.bottomControlsLabel)
-        }
-      />
-      <Text
-        style={[
-          styles.label,
-          {
-            color: isActive
-              ? getColors(theme, Colors.yellow)
-              : getColors(theme, Colors.bottomControlsLabel),
-          },
-        ]}>
-        {c.name}
-      </Text>
-    </TouchableOpacity>
-  );
-};
+    return (
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={onPress}
+        style={styles.controlWrapper}>
+        <View>
+          {c.withFavouritesBadge && Boolean(favouritesListState.list.length) && (
+            <View style={styles.badgeWrapper}>
+              <Text
+                style={[
+                  styles.badgeLabel,
+                  // eslint-disable-next-line react-native/no-inline-styles
+                  {
+                    fontSize: favouritesListState.list.length > 1 ? 10 : 12,
+                  },
+                ]}>
+                {favouritesListState.list.length}
+              </Text>
+            </View>
+          )}
+          <Icon
+            size={25}
+            type={c.iconProps.type}
+            name={
+              isActive
+                ? c.iconProps.activeIconName
+                : c.iconProps.inactiveIconName
+            }
+            color={
+              isActive
+                ? getColors(theme, Colors.yellow)
+                : getColors(theme, Colors.bottomControlsLabel)
+            }
+          />
+        </View>
+        <Text
+          style={[
+            styles.label,
+            {
+              color: isActive
+                ? getColors(theme, Colors.yellow)
+                : getColors(theme, Colors.bottomControlsLabel),
+            },
+          ]}>
+          {c.name}
+        </Text>
+      </TouchableOpacity>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -161,5 +185,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
     marginTop: 3,
+  },
+  badgeWrapper: {
+    position: 'absolute',
+    top: -8,
+    right: -12,
+    backgroundColor: '#d80000',
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeLabel: {
+    fontSize: 12,
+    letterSpacing: -1,
+    color: 'white',
+    fontWeight: 'bold',
   },
 });

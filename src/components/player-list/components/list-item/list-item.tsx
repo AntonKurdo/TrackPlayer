@@ -1,11 +1,11 @@
-import React, {FC, useCallback, useEffect, useState} from 'react';
+import React, {FC, useCallback, useEffect, useState, useMemo} from 'react';
 import {
   View,
   Image,
   Text,
   useColorScheme,
-  TouchableOpacity,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
 import TrackPlayer, {
   Event,
@@ -14,6 +14,8 @@ import TrackPlayer, {
 } from 'react-native-track-player';
 import * as Animatable from 'react-native-animatable';
 
+import {SwipeableButton} from '../../../swipeable-button';
+import favouritesList from '../../../../state-management/state/favourites-list';
 import {TrackType} from '../../../../data/types';
 import {Colors, getColors} from '../../../../style/colors';
 import {Icon} from '../../../../components/icon';
@@ -24,9 +26,10 @@ type ListItemProps = {
   track: TrackType;
   index: number;
   isLast: boolean;
+  withSweapable?: boolean;
 };
 
-export const ListItem: FC<ListItemProps> = ({track, isLast}) => {
+export const ListItem: FC<ListItemProps> = ({track, isLast, withSweapable}) => {
   const theme = useColorScheme();
 
   const [playedNow, setPlayedNow] = useState(false);
@@ -74,6 +77,10 @@ export const ListItem: FC<ListItemProps> = ({track, isLast}) => {
     },
   );
 
+  const unlike = useCallback(() => {
+    favouritesList.removeTrackFromFavourites(track.id);
+  }, [track.id]);
+
   const onPressHandler = useCallback(async () => {
     try {
       const currentTrack = await TrackPlayer.getCurrentTrack();
@@ -97,73 +104,91 @@ export const ListItem: FC<ListItemProps> = ({track, isLast}) => {
     }
   }, [track.id]);
 
-  return (
-    <TouchableOpacity
-      onPress={onPressHandler}
-      activeOpacity={0.7}
-      style={[
-        styles.wrapper,
-        // eslint-disable-next-line react-native/no-inline-styles
-        {
-          borderBottomColor: !isLast
-            ? getColors(theme, Colors.label)
-            : 'transparent',
-          backgroundColor: playedNow
-            ? getColors(theme, Colors.label)
-            : 'transparent',
-        },
-      ]}>
-      <View>
-        <Image style={styles.cover} source={{uri: track.artwork}} />
-        <View style={[StyleSheet.absoluteFill, styles.coverInnerWrapper]}>
-          {playedNow ? (
-            <Animatable.View
-              style={[
-                styles.dot,
-                {
-                  backgroundColor: getColors(theme, Colors.yellow),
-                },
-              ]}
-              useNativeDriver={true}
-              duration={1200}
-              animation="pulse"
-              iterationCount={'infinite'}
-            />
-          ) : (
-            <Icon
-              name={'play'}
-              size={27}
-              color={getColors(theme, Colors.yellow)}
-            />
-          )}
+  const content = useMemo(
+    () => (
+      <View
+        style={[
+          styles.wrapper,
+          // eslint-disable-next-line react-native/no-inline-styles
+          {
+            borderBottomColor: !isLast
+              ? getColors(theme, Colors.label)
+              : 'transparent',
+            backgroundColor: playedNow
+              ? getColors(theme, Colors.label)
+              : 'transparent',
+          },
+        ]}>
+        <View>
+          <Image style={styles.cover} source={{uri: track.artwork}} />
+          <TouchableOpacity
+            onPress={onPressHandler}
+            activeOpacity={0.7}
+            style={[StyleSheet.absoluteFill, styles.coverInnerWrapper]}>
+            {playedNow ? (
+              <Animatable.View
+                style={[
+                  styles.dot,
+                  {
+                    backgroundColor: getColors(theme, Colors.yellow),
+                  },
+                ]}
+                useNativeDriver={true}
+                duration={1200}
+                animation="pulse"
+                iterationCount={'infinite'}
+              />
+            ) : (
+              <Icon
+                name={'play'}
+                size={27}
+                color={getColors(theme, Colors.yellow)}
+              />
+            )}
+          </TouchableOpacity>
+        </View>
+        <View style={styles.nameWrapper}>
+          <Text
+            numberOfLines={1}
+            style={[
+              styles.title,
+              {
+                color: playedNow
+                  ? getColors(theme, Colors.background)
+                  : getColors(theme, Colors.label),
+              },
+            ]}>
+            {track.title}
+          </Text>
+          <Text
+            numberOfLines={1}
+            style={[
+              styles.artist,
+              {
+                color: playedNow
+                  ? getColors(theme, Colors.background)
+                  : getColors(theme, Colors.label),
+              },
+            ]}>
+            {track.artist}
+          </Text>
         </View>
       </View>
-      <View style={styles.nameWrapper}>
-        <Text
-          numberOfLines={1}
-          style={[
-            styles.title,
-            {
-              color: playedNow
-                ? getColors(theme, Colors.background)
-                : getColors(theme, Colors.label),
-            },
-          ]}>
-          {track.title}
-        </Text>
-        <Text
-          numberOfLines={1}
-          style={[
-            styles.artist,
-            {
-              color: playedNow
-                ? getColors(theme, Colors.background)
-                : getColors(theme, Colors.label),
-            },
-          ]}>
-          {track.artist}
-        </Text>
-      </View>
-    </TouchableOpacity>
+    ),
+    [
+      isLast,
+      onPressHandler,
+      playedNow,
+      theme,
+      track.artist,
+      track.artwork,
+      track.title,
+    ],
   );
+
+  if (withSweapable) {
+    return <SwipeableButton onPress={unlike}>{content}</SwipeableButton>;
+  }
+
+  return content;
 };
