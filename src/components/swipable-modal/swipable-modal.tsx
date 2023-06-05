@@ -11,14 +11,16 @@ type Props = {
   isVisible: boolean;
   closeModal: () => void;
   children: React.ReactNode;
+  propagateSwipe?: boolean;
 };
 
 export const SwipableModal: FC<Props> = appObserver(
-  ({isVisible, closeModal, children}) => {
+  ({isVisible, closeModal, propagateSwipe, children}) => {
     const theme = useColorScheme();
 
     return (
       <Modal
+        propagateSwipe={propagateSwipe}
         backdropColor={getColors(theme, Colors.label)}
         style={styles.container}
         isVisible={isVisible}

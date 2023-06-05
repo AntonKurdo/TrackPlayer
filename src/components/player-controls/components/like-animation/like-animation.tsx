@@ -1,4 +1,4 @@
-import React, {forwardRef} from 'react';
+import React, {forwardRef, memo} from 'react';
 import {View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 
@@ -10,21 +10,23 @@ type Props = {
   isLiked: boolean;
 };
 
-export const LikeAnimation = forwardRef(
-  ({isLiked}: Props, ref: React.ForwardedRef<Animatable.View & View>) => {
-    return (
-      <View style={styles.container}>
-        <Animatable.View
-          style={styles.initialOpacity}
-          ref={ref}
-          duration={1300}>
-          <Icon
-            name={!isLiked ? 'hearto' : 'heart'}
-            size={90}
-            color={'white'}
-          />
-        </Animatable.View>
-      </View>
-    );
-  },
+export const LikeAnimation = memo(
+  forwardRef(
+    ({isLiked}: Props, ref: React.ForwardedRef<Animatable.View & View>) => {
+      return (
+        <View style={styles.container}>
+          <Animatable.View
+            style={styles.initialOpacity}
+            ref={ref}
+            duration={1300}>
+            <Icon
+              name={!isLiked ? 'hearto' : 'heart'}
+              size={90}
+              color={'white'}
+            />
+          </Animatable.View>
+        </View>
+      );
+    },
+  ),
 );

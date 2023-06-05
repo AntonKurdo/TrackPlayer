@@ -10,16 +10,6 @@ export const styles = StyleSheet.create({
     borderTopEndRadius: 16,
     borderTopStartRadius: 16,
   },
-  coverWrapper: {
-    alignItems: 'center',
-    marginBottom: 16,
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  cover: {
-    width: 250,
-    height: 250,
-  },
   title: {
     fontSize: 17,
     letterSpacing: 1.5,

@@ -8,11 +8,11 @@ import React, {
 } from 'react';
 import {
   ColorSchemeName,
-  GestureResponderEvent,
-  Image,
+  FlatList,
   Text,
   TouchableWithoutFeedback,
   View,
+  ViewToken,
 } from 'react-native';
 import TrackPlayer, {
   Event,
@@ -26,12 +26,12 @@ import {TrackType} from '../../data/types';
 import {Colors, getColors} from '../../style/colors';
 import {IconButton} from '../icon-button';
 import {TrackProgress} from '../track-progress';
-import {LikeAnimation} from './components/like-animation';
 import {Icon} from '../icon';
 import {checkPostionOfTrack} from './utils';
 import {appObserver, appComputed} from '../../state-management/utils';
 import {favouritesListState} from '../../state-management';
 import {zoomOutAnimation} from '../../utils/animation';
+import {CoverCarousel} from './components/cover-carousel';
 
 import {styles} from './player-controls.styles';
 
@@ -43,10 +43,8 @@ type PlayerControlsType = {
 
 export const PlayerControls: FC<PlayerControlsType> = appObserver(
   ({isVisible, onClose, theme}) => {
-    const touchX = useRef(0);
-
-    const lastPress = useRef(0);
-
+    const coversListRef = useRef<FlatList<TrackType>>(null);
+    const currentCoverIndex = useRef<number | null>(null);
     const likeRef = useRef<
       Animatable.View & View & {animate: (params: unknown) => void}
     >(null);
@@ -54,15 +52,12 @@ export const PlayerControls: FC<PlayerControlsType> = appObserver(
     const [trackInfo, setTrackInfo] = useState<TrackType | undefined>(
       undefined,
     );
-
+    const [initialTrackIndex, setInitialTrackIndex] = useState(0);
     const [playbackState, setPlaybackState] = useState(State.Ready);
-
     const [isSpreadTitle, setSpreadTitle] = useState(false);
-
     const [repeatMode, setRepeatMode] = useState<RepeatMode | undefined>(
       RepeatMode.Off,
     );
-
     const [isPrevDisabled, setPrevDisabled] = useState(false);
     const [isNextDisabled, setNextDisabled] = useState(false);
 
@@ -75,6 +70,7 @@ export const PlayerControls: FC<PlayerControlsType> = appObserver(
     useEffect(() => {
       if (isVisible) {
         TrackPlayer.getCurrentTrack().then(async track => {
+          setInitialTrackIndex(track!);
           const mode = await TrackPlayer.getRepeatMode();
           setRepeatMode(mode);
           const currentTrack = await TrackPlayer.getTrack(track as number);
@@ -108,6 +104,11 @@ export const PlayerControls: FC<PlayerControlsType> = appObserver(
         ) {
           const track = await TrackPlayer.getTrack(event.nextTrack);
           const queue = await TrackPlayer.getQueue();
+
+          coversListRef.current?.scrollToIndex({
+            index: event.nextTrack,
+          });
+          currentCoverIndex.current = event.nextTrack;
 
           checkPostionOfTrack({
             trackPosition: event.nextTrack,
@@ -157,6 +158,20 @@ export const PlayerControls: FC<PlayerControlsType> = appObserver(
       [],
     );
 
+    const onViewableItemsChanged = useCallback(
+      async ({changed}: {changed: ViewToken[]}) => {
+        const newIndex = changed[0].index;
+
+        currentCoverIndex.current = newIndex;
+
+        const trackPosition = await TrackPlayer.getCurrentTrack();
+        if (newIndex !== trackPosition) {
+          TrackPlayer.skip(changed[0].index!);
+        }
+      },
+      [],
+    );
+
     const switchRepeatMode = useCallback(async () => {
       if (repeatMode === RepeatMode.Off) {
         try {
@@ -175,66 +190,22 @@ export const PlayerControls: FC<PlayerControlsType> = appObserver(
       }
     }, [repeatMode]);
 
-    const favouritesHandler = useCallback(() => {
-      if (!trackInfo?.id) {
-        return;
-      }
-
-      if (isTrackLiked) {
-        favouritesListState.removeTrackFromFavourites(trackInfo.id);
-      } else {
-        favouritesListState.addTrackToFavourites(trackInfo);
-      }
-
-      likeRef?.current?.animate(zoomOutAnimation);
-    }, [isTrackLiked, trackInfo]);
-
-    const onDoublePress = useCallback(
-      (_: GestureResponderEvent) => {
-        const time = new Date().getTime();
-        const delta = time - lastPress.current;
-
-        const DOUBLE_PRESS_DELAY = 400;
-        if (delta < DOUBLE_PRESS_DELAY) {
-          favouritesHandler();
-        }
-        lastPress.current = time;
-
-        return true;
-      },
-      [favouritesHandler],
-    );
-
-    const onTouchStart = useCallback((evt: GestureResponderEvent) => {
-      touchX.current = evt.nativeEvent.pageX;
-    }, []);
-
-    const onTouchEnd = useCallback(async (evt: GestureResponderEvent) => {
-      evt.persist();
-      try {
-        if (
-          touchX.current - evt.nativeEvent.pageX < 10 &&
-          touchX.current - evt.nativeEvent.pageX > -10
-        ) {
+    const favouritesHandler = useCallback(
+      (isLiked: boolean) => {
+        if (!trackInfo?.id) {
           return;
         }
-        const track = await TrackPlayer.getCurrentTrack();
-        const queue = await TrackPlayer.getQueue();
 
-        if (touchX.current - evt.nativeEvent.pageX < 0 && track !== 0) {
-          await TrackPlayer.skipToPrevious();
+        if (isLiked) {
+          favouritesListState.removeTrackFromFavourites(trackInfo.id);
+        } else {
+          favouritesListState.addTrackToFavourites(trackInfo);
         }
-        if (
-          touchX.current - evt.nativeEvent.pageX > 0 &&
-          track !== queue.length - 1
-        ) {
-          await TrackPlayer.skipToNext();
-        }
-        touchX.current = 0;
-      } catch (error) {
-        console.error({error});
-      }
-    }, []);
+
+        likeRef?.current?.animate(zoomOutAnimation);
+      },
+      [trackInfo],
+    );
 
     return (
       <View
@@ -274,14 +245,13 @@ export const PlayerControls: FC<PlayerControlsType> = appObserver(
 
         {trackInfo && (
           <>
-            <View
-              onStartShouldSetResponder={onDoublePress}
-              style={styles.coverWrapper}
-              onTouchStart={onTouchStart}
-              onTouchEnd={onTouchEnd}>
-              <Image style={styles.cover} source={{uri: trackInfo?.artwork}} />
-              <LikeAnimation isLiked={isTrackLiked} ref={likeRef} />
-            </View>
+            <CoverCarousel
+              ref={coversListRef}
+              initialIndex={initialTrackIndex}
+              onViewableItemsChanged={onViewableItemsChanged}
+              onFavouriteChanged={favouritesHandler}
+            />
+
             <TouchableWithoutFeedback
               onPress={() => setSpreadTitle(!isSpreadTitle)}>
               <Text
@@ -359,12 +329,10 @@ export const PlayerControls: FC<PlayerControlsType> = appObserver(
                   <Icon
                     name={isTrackLiked ? 'heart' : 'hearto'}
                     size={20}
-                    color={
-                      isNextDisabled ? 'gray' : getColors(theme, Colors.button)
-                    }
+                    color={getColors(theme, Colors.button)}
                   />
                 }
-                onPress={favouritesHandler}
+                onPress={favouritesHandler.bind(null, isTrackLiked)}
               />
             </View>
 
