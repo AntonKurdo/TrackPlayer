@@ -16,8 +16,8 @@ export const LikeAnimation = memo(
       return (
         <View style={styles.container}>
           <Animatable.View
-            style={styles.initialOpacity}
             ref={ref}
+            style={styles.initialOpacity}
             duration={1300}>
             <Icon
               name={!isLiked ? 'hearto' : 'heart'}

@@ -24,12 +24,19 @@ import {styles} from './list-item.styles';
 
 type ListItemProps = {
   track: TrackType;
-  index: number;
   isLast: boolean;
   withSweapable?: boolean;
+  DragAreaComponent?: React.ReactNode;
+  isDragActive?: boolean;
 };
 
-export const ListItem: FC<ListItemProps> = ({track, isLast, withSweapable}) => {
+export const ListItem: FC<ListItemProps> = ({
+  track,
+  isLast,
+  withSweapable,
+  DragAreaComponent,
+  isDragActive,
+}) => {
   const theme = useColorScheme();
 
   const [playedNow, setPlayedNow] = useState(false);
@@ -119,34 +126,38 @@ export const ListItem: FC<ListItemProps> = ({track, isLast, withSweapable}) => {
               : 'transparent',
           },
         ]}>
-        <View>
-          <Image style={styles.cover} source={{uri: track.artwork}} />
-          <TouchableOpacity
-            onPress={onPressHandler}
-            activeOpacity={0.7}
-            style={[StyleSheet.absoluteFill, styles.coverInnerWrapper]}>
-            {playedNow ? (
-              <Animatable.View
-                style={[
-                  styles.dot,
-                  {
-                    backgroundColor: getColors(theme, Colors.yellow),
-                  },
-                ]}
-                useNativeDriver={true}
-                duration={1200}
-                animation="pulse"
-                iterationCount={'infinite'}
-              />
-            ) : (
-              <Icon
-                name={'play'}
-                size={27}
-                color={getColors(theme, Colors.yellow)}
-              />
-            )}
-          </TouchableOpacity>
-        </View>
+        {isDragActive ? (
+          DragAreaComponent
+        ) : (
+          <View>
+            <Image style={styles.cover} source={{uri: track.artwork}} />
+            <TouchableOpacity
+              onPress={onPressHandler}
+              activeOpacity={0.7}
+              style={[StyleSheet.absoluteFill, styles.coverInnerWrapper]}>
+              {playedNow ? (
+                <Animatable.View
+                  style={[
+                    styles.dot,
+                    {
+                      backgroundColor: getColors(theme, Colors.yellow),
+                    },
+                  ]}
+                  useNativeDriver={true}
+                  duration={1200}
+                  animation="pulse"
+                  iterationCount={'infinite'}
+                />
+              ) : (
+                <Icon
+                  name={'play'}
+                  size={27}
+                  color={getColors(theme, Colors.yellow)}
+                />
+              )}
+            </TouchableOpacity>
+          </View>
+        )}
         <View style={styles.nameWrapper}>
           <Text
             numberOfLines={1}
@@ -176,6 +187,8 @@ export const ListItem: FC<ListItemProps> = ({track, isLast, withSweapable}) => {
       </View>
     ),
     [
+      DragAreaComponent,
+      isDragActive,
       isLast,
       onPressHandler,
       playedNow,

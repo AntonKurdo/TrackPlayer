@@ -30,6 +30,12 @@ class FavouritesList {
 
     Storage.setArray(Storage.storageKeys.favouritesList, updatedList);
   }
+
+  updateList(list: TrackType[]) {
+    this._favourites = list;
+
+    Storage.setArray(Storage.storageKeys.favouritesList, list);
+  }
 }
 
 export default new FavouritesList();

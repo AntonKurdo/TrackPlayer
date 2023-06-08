@@ -1,7 +1,9 @@
 import {Dimensions, StyleSheet} from 'react-native';
+import {TRACK_HEIGHT} from '../../player';
 
 export const styles = StyleSheet.create({
   wrapper: {
+    height: TRACK_HEIGHT,
     paddingHorizontal: 16,
     paddingVertical: 4,
     flexDirection: 'row',

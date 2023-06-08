@@ -3,6 +3,7 @@ import {Image, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {useUpdateEffect} from 'react-use';
+import {runOnJS} from 'react-native-reanimated';
 
 import {TrackType} from '../../../../../../data/types';
 import {LikeAnimation} from '../../../like-animation';
@@ -17,7 +18,6 @@ import {styles} from './list-item.styles';
 
 type Props = {
   trackInfo: TrackType;
-
   favouritesHandler: (isLiked: boolean) => void;
 };
 
@@ -42,7 +42,7 @@ export const ListItem: FC<Props> = appObserver(
 
     const onDoubleTap = Gesture.Tap()
       .numberOfTaps(2)
-      .onStart(() => favouritesHandler(isTrackLiked));
+      .onStart(runOnJS(() => favouritesHandler(isTrackLiked)));
 
     return (
       <GestureDetector gesture={onDoubleTap}>

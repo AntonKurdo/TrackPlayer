@@ -29,7 +29,9 @@ export const Main = () => {
           backgroundColor: getColors(theme, Colors.background),
         },
       ]}>
-      <PlayerList loading={loading} data={trackList} />
+      {trackList.length > 0 && (
+        <PlayerList loading={loading} data={trackList} />
+      )}
     </SafeAreaView>
   );
 };
