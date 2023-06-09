@@ -1,20 +1,20 @@
-import {TrackType} from '../../../../data/types';
+import {DraggbleDataObject} from '../../types';
 
 export function objectMove(
-  object: {[key: string]: TrackType['id']},
-  from: TrackType['id'],
-  to: TrackType['id'],
+  object: DraggbleDataObject,
+  from: number,
+  to: number,
 ) {
   'worklet';
 
   const newObject = Object.assign({}, object);
   for (const id in object) {
-    if (object[id] === from) {
-      newObject[id] = to;
+    if (object[id]?.index === from) {
+      newObject[id] = {index: to, item: newObject[id].item};
     }
 
-    if (object[id] === to) {
-      newObject[id] = from;
+    if (object[id]?.index === to) {
+      newObject[id] = {index: from, item: newObject[id].item};
     }
   }
 

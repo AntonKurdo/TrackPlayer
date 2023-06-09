@@ -7,4 +7,5 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  animatedItem: {left: 0, right: 0, position: 'absolute'},
 });

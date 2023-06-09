@@ -127,9 +127,11 @@ export const ListItem: FC<ListItemProps> = ({
           },
         ]}>
         {isDragActive ? (
-          DragAreaComponent
+          <Animatable.View animation={'fadeIn'} duration={500} useNativeDriver>
+            {DragAreaComponent}
+          </Animatable.View>
         ) : (
-          <View>
+          <Animatable.View animation={'fadeIn'} duration={500} useNativeDriver>
             <Image style={styles.cover} source={{uri: track.artwork}} />
             <TouchableOpacity
               onPress={onPressHandler}
@@ -156,7 +158,7 @@ export const ListItem: FC<ListItemProps> = ({
                 />
               )}
             </TouchableOpacity>
-          </View>
+          </Animatable.View>
         )}
         <View style={styles.nameWrapper}>
           <Text

@@ -1,25 +1,18 @@
 import {TrackType} from '../../data/types';
+import {DraggbleDataObject} from './types';
 
 export function listToObject(list: TrackType[]) {
-  const values = Object.values(list);
-  const object = {};
+  const object: DraggbleDataObject = {};
 
-  for (let i = 0; i < values.length; i++) {
-    object[values[i].id] = i;
+  for (let i = 0; i < list.length; i++) {
+    object[list[i].id] = {index: i, item: list[i]};
   }
 
   return object;
 }
 
-export const objectToList = (
-  obj: {[key: string]: TrackType['id']},
-  data: TrackType[],
-): TrackType[] => {
-  const arr: TrackType[] = [];
-
-  Object.keys(obj).map(
-    id => (arr[obj[id]] = data.find(el => el.id.toString() === id.toString())),
-  );
-
-  return arr;
+export const objectToList = (obj: DraggbleDataObject): TrackType[] => {
+  return Object.values(obj)
+    .sort((a, b) => (a.index > b.index ? 1 : -1))
+    .map(el => el.item);
 };

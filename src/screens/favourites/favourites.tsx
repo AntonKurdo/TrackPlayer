@@ -55,7 +55,10 @@ export const Favourites = appObserver(() => {
           backgroundColor: getColors(theme, Colors.background),
         },
       ]}>
-      <Header title="Favourites" headerRight={headerRight} />
+      <Header
+        title="Favourites"
+        headerRight={favouritesListState.list.length > 1 ? headerRight : null}
+      />
       <PlayerList
         withSweapable
         isDragActive={isDragActive}

@@ -10,13 +10,13 @@ import Animated, {
 } from 'react-native-reanimated';
 import {useUpdateEffect} from 'react-use';
 
+import {favouritesListState} from '../../state-management';
 import {TrackType} from '../../data/types';
 import {EmptyList} from '../empty-list';
 import {MovableTrack} from './components/movable-track';
 import {listToObject, objectToList} from './utils';
 
 import {styles} from './player.styles';
-import {favouritesListState} from '../../state-management';
 
 type PlayerProps = {
   data: TrackType[];
@@ -48,7 +48,7 @@ export const PlayerList: FC<PlayerProps> = ({
 
   useUpdateEffect(() => {
     if (!isDragActive) {
-      const updatedData = objectToList(positions.value, data);
+      const updatedData = objectToList(positions.value);
       favouritesListState.updateList(updatedData);
     }
   }, [isDragActive]);
