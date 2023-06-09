@@ -6,6 +6,7 @@ class StorageService {
   private _storageKeys = {
     lastTrackId: 'lastTrackId',
     favouritesList: 'favouritesList',
+    repeatMode: 'repeatMode',
   };
 
   constructor() {
@@ -22,6 +23,14 @@ class StorageService {
 
   getInt = (name: string) => {
     return this.storage.getInt(name);
+  };
+
+  setString = (name: string, value: string) => {
+    return this.storage.setString(name, value);
+  };
+
+  getString = (name: string) => {
+    return this.storage.getString(name);
   };
 
   setArray = <T>(name: string, value: T[]) => {

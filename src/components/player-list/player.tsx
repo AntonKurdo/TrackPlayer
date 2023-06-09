@@ -95,7 +95,7 @@ export const PlayerList: FC<PlayerProps> = ({
             track={t}
             index={index}
             dataLength={data.length}
-            withSweapable={isDragActive ? false : withSweapable}
+            withSweapable={!isDragActive ? false : withSweapable}
             scrollY={scrollY}
           />
         );

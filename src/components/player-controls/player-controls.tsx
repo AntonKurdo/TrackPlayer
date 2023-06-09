@@ -32,6 +32,7 @@ import {appObserver, appComputed} from '../../state-management/utils';
 import {favouritesListState} from '../../state-management';
 import {zoomOutAnimation} from '../../utils/animation';
 import {CoverCarousel} from './components/cover-carousel';
+import {Storage} from '../../services/storage';
 
 import {styles} from './player-controls.styles';
 
@@ -55,8 +56,8 @@ export const PlayerControls: FC<PlayerControlsType> = appObserver(
     const [initialTrackIndex, setInitialTrackIndex] = useState(0);
     const [playbackState, setPlaybackState] = useState(State.Ready);
     const [isSpreadTitle, setSpreadTitle] = useState(false);
-    const [repeatMode, setRepeatMode] = useState<RepeatMode | undefined>(
-      RepeatMode.Off,
+    const [repeatMode, setRepeatMode] = useState<RepeatMode>(
+      Storage.getInt(Storage.storageKeys.repeatMode) || RepeatMode.Off,
     );
     const [isPrevDisabled, setPrevDisabled] = useState(false);
     const [isNextDisabled, setNextDisabled] = useState(false);
@@ -71,8 +72,7 @@ export const PlayerControls: FC<PlayerControlsType> = appObserver(
       if (isVisible) {
         TrackPlayer.getCurrentTrack().then(async track => {
           setInitialTrackIndex(track!);
-          const mode = await TrackPlayer.getRepeatMode();
-          setRepeatMode(mode);
+
           const currentTrack = await TrackPlayer.getTrack(track as number);
           setTrackInfo(currentTrack as TrackType);
 
@@ -177,6 +177,7 @@ export const PlayerControls: FC<PlayerControlsType> = appObserver(
         try {
           await TrackPlayer.setRepeatMode(RepeatMode.Track);
           setRepeatMode(RepeatMode.Track);
+          Storage.setInt(Storage.storageKeys.repeatMode, RepeatMode.Track);
         } catch (error) {
           console.error({error});
         }
@@ -184,6 +185,7 @@ export const PlayerControls: FC<PlayerControlsType> = appObserver(
         try {
           await TrackPlayer.setRepeatMode(RepeatMode.Off);
           setRepeatMode(RepeatMode.Off);
+          Storage.setInt(Storage.storageKeys.repeatMode, RepeatMode.Off);
         } catch (error) {
           console.error({error});
         }

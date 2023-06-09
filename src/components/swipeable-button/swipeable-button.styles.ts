@@ -5,9 +5,14 @@ export const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: 'red',
     justifyContent: 'center',
-    paddingHorizontal: 10,
     borderRadius: 4,
     marginVertical: 1,
   },
   renderRightActionLabel: {fontWeight: 'bold', color: 'white'},
+  button: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
 });

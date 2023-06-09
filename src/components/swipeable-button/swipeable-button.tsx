@@ -40,7 +40,10 @@ export const SwipeableButton: FC<Props> = ({children, onPress}) => {
               transform: [{translateX: trans}],
             },
           ]}>
-          <TouchableOpacity activeOpacity={0.7} onPress={onPress}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={onPress}
+            style={styles.button}>
             <Animated.Text
               style={[
                 styles.renderRightActionLabel,

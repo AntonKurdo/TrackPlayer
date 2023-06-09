@@ -7,7 +7,6 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 4,
     flexDirection: 'row',
-    borderBottomWidth: 0.3,
   },
   cover: {width: 50, height: 50, borderRadius: 4},
   nameWrapper: {

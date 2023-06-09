@@ -13,6 +13,7 @@ import TrackPlayer, {
   useTrackPlayerEvents,
 } from 'react-native-track-player';
 import * as Animatable from 'react-native-animatable';
+import Animated, {useAnimatedStyle, withTiming} from 'react-native-reanimated';
 
 import {SwipeableButton} from '../../../swipeable-button';
 import favouritesList from '../../../../state-management/state/favourites-list';
@@ -45,6 +46,13 @@ export const ListItem: FC<ListItemProps> = ({
     checkIfPlayingWhileInitialization();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const animatedStyles = useAnimatedStyle(
+    () => ({
+      borderBottomWidth: withTiming(!isLast ? 0.3 : 0),
+    }),
+    [isLast],
+  );
 
   const checkIfPlayingWhileInitialization = useCallback(async () => {
     const isPlaying = (await TrackPlayer.getState()) === State.Playing;
@@ -113,8 +121,9 @@ export const ListItem: FC<ListItemProps> = ({
 
   const content = useMemo(
     () => (
-      <View
+      <Animated.View
         style={[
+          animatedStyles,
           styles.wrapper,
           // eslint-disable-next-line react-native/no-inline-styles
           {
@@ -186,10 +195,11 @@ export const ListItem: FC<ListItemProps> = ({
             {track.artist}
           </Text>
         </View>
-      </View>
+      </Animated.View>
     ),
     [
       DragAreaComponent,
+      animatedStyles,
       isDragActive,
       isLast,
       onPressHandler,
