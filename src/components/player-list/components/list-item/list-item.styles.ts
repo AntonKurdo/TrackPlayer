@@ -1,6 +1,8 @@
 import {Dimensions, StyleSheet} from 'react-native';
 import {TRACK_HEIGHT} from '../../player';
 
+const WIDTH = Dimensions.get('screen').width * 0.75;
+
 export const styles = StyleSheet.create({
   wrapper: {
     height: TRACK_HEIGHT,
@@ -13,12 +15,12 @@ export const styles = StyleSheet.create({
     marginLeft: 8,
   },
   title: {
-    maxWidth: Dimensions.get('screen').width * 0.75,
+    maxWidth: WIDTH,
     fontSize: 17,
     fontWeight: '600',
   },
   artist: {
-    maxWidth: Dimensions.get('screen').width * 0.75,
+    maxWidth: WIDTH,
     fontSize: 14,
   },
   coverInnerWrapper: {

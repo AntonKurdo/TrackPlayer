@@ -209,6 +209,11 @@ export const PlayerControls: FC<PlayerControlsType> = appObserver(
       [trackInfo],
     );
 
+    const toggleSpreadTitle = useCallback(
+      () => setSpreadTitle(!isSpreadTitle),
+      [isSpreadTitle],
+    );
+
     return (
       <View
         style={[
@@ -254,91 +259,97 @@ export const PlayerControls: FC<PlayerControlsType> = appObserver(
               onFavouriteChanged={favouritesHandler}
             />
 
-            <TouchableWithoutFeedback
-              onPress={() => setSpreadTitle(!isSpreadTitle)}>
+            <View style={styles.innerWrapper}>
+              <TouchableWithoutFeedback onPress={toggleSpreadTitle}>
+                <Text
+                  numberOfLines={isSpreadTitle ? undefined : 1}
+                  style={[
+                    {
+                      color: getColors(theme, Colors.label),
+                    },
+                    styles.title,
+                  ]}>
+                  {trackInfo?.title}
+                </Text>
+              </TouchableWithoutFeedback>
               <Text
-                numberOfLines={isSpreadTitle ? undefined : 1}
                 style={[
                   {
                     color: getColors(theme, Colors.label),
                   },
-                  styles.title,
+                  styles.artist,
                 ]}>
-                {trackInfo?.title}
+                {trackInfo?.artist}
               </Text>
-            </TouchableWithoutFeedback>
-            <Text
-              style={[
-                {
-                  color: getColors(theme, Colors.label),
-                },
-                styles.artist,
-              ]}>
-              {trackInfo?.artist}
-            </Text>
-            <View style={styles.controlWrapper}>
-              <IconButton
-                disabled={isPrevDisabled}
-                icon={
-                  <Icon
-                    name="stepbackward"
-                    size={20}
-                    color={
-                      isPrevDisabled ? 'gray' : getColors(theme, Colors.button)
-                    }
-                  />
-                }
-                onPress={skipToPrevious}
-              />
-              <IconButton
-                isSelected={playbackState === State.Playing}
-                icon={
-                  <Icon
-                    name="play"
-                    size={35}
-                    color={getColors(theme, Colors.button)}
-                  />
-                }
-                onPress={play}
-              />
-              <IconButton
-                isSelected={playbackState === State.Paused}
-                icon={
-                  <Icon
-                    name="pause"
-                    size={35}
-                    color={getColors(theme, Colors.button)}
-                  />
-                }
-                onPress={pause}
-              />
-              <IconButton
-                disabled={isNextDisabled}
-                icon={
-                  <Icon
-                    name="stepforward"
-                    size={20}
-                    color={
-                      isNextDisabled ? 'gray' : getColors(theme, Colors.button)
-                    }
-                  />
-                }
-                onPress={skipToNext}
-              />
-              <IconButton
-                containerStyle={styles.likeButton}
-                icon={
-                  <Icon
-                    name={isTrackLiked ? 'heart' : 'hearto'}
-                    size={20}
-                    color={getColors(theme, Colors.button)}
-                  />
-                }
-                onPress={favouritesHandler.bind(null, isTrackLiked)}
-              />
+              <View style={styles.controlWrapper}>
+                <IconButton
+                  disabled={isPrevDisabled}
+                  icon={
+                    <Icon
+                      name="stepbackward"
+                      size={20}
+                      color={
+                        isPrevDisabled
+                          ? 'gray'
+                          : getColors(theme, Colors.button)
+                      }
+                    />
+                  }
+                  onPress={skipToPrevious}
+                />
+                <IconButton
+                  isSelected={playbackState === State.Playing}
+                  icon={
+                    <Icon
+                      name="play"
+                      size={35}
+                      color={getColors(theme, Colors.button)}
+                    />
+                  }
+                  onPress={play}
+                />
+                <IconButton
+                  isSelected={playbackState === State.Paused}
+                  icon={
+                    <Icon
+                      name="pause"
+                      size={35}
+                      color={getColors(theme, Colors.button)}
+                    />
+                  }
+                  onPress={pause}
+                />
+                <IconButton
+                  disabled={isNextDisabled}
+                  icon={
+                    <Icon
+                      name="stepforward"
+                      size={20}
+                      color={
+                        isNextDisabled
+                          ? 'gray'
+                          : getColors(theme, Colors.button)
+                      }
+                    />
+                  }
+                  onPress={skipToNext}
+                />
+                <IconButton
+                  containerStyle={styles.likeButton}
+                  icon={
+                    <Icon
+                      name={isTrackLiked ? 'heart' : 'hearto'}
+                      size={20}
+                      color={getColors(theme, Colors.button)}
+                    />
+                  }
+                  onPress={favouritesHandler.bind(null, isTrackLiked)}
+                />
+              </View>
             </View>
-
-            <TrackProgress />
+            <View style={styles.paddingWrapper}>
+              <TrackProgress />
+            </View>
           </>
         )}
       </View>

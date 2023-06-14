@@ -3,7 +3,6 @@ import {StyleSheet} from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
     paddingVertical: 40,
     justifyContent: 'center',
     alignItems: 'center',
@@ -20,7 +19,6 @@ export const styles = StyleSheet.create({
   controlWrapper: {
     justifyContent: 'center',
     width: '100%',
-
     marginTop: 16,
     flexDirection: 'row',
     alignItems: 'center',
@@ -39,4 +37,10 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
   },
+  innerWrapper: {
+    width: '100%',
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  paddingWrapper: {paddingHorizontal: 20},
 });

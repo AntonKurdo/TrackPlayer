@@ -2,6 +2,8 @@ import {Dimensions, StyleSheet} from 'react-native';
 
 const bottomControlsHeight = 50;
 
+const WIDTH = Dimensions.get('screen').width * 0.65;
+
 export const styles = StyleSheet.create({
   container: {
     width: Dimensions.get('window').width,
@@ -22,11 +24,11 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: '600',
-    maxWidth: Dimensions.get('screen').width * 0.65,
+    maxWidth: WIDTH,
   },
   artist: {
     fontSize: 11,
-    maxWidth: Dimensions.get('screen').width * 0.65,
+    maxWidth: WIDTH,
   },
   cover: {
     width: 37,
@@ -44,7 +46,7 @@ export const styles = StyleSheet.create({
   sliderStyles: {width: Dimensions.get('window').width, height: 0},
   progressThumbStyles: {width: 0, height: 0},
   animationWrapper: {
-    width: Dimensions.get('screen').width * 0.65,
+    width: WIDTH,
     overflow: 'hidden',
   },
 });

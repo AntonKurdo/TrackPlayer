@@ -1,5 +1,5 @@
 import React, {FC, useMemo, useRef} from 'react';
-import {Image, View} from 'react-native';
+import {Image, View, useColorScheme} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {useUpdateEffect} from 'react-use';
@@ -13,6 +13,7 @@ import {
 } from '../../../../../../state-management/utils';
 import {favouritesListState} from '../../../../../../state-management';
 import {zoomOutAnimation} from '../../../../../../utils/animation';
+import {Colors, getColors} from '../../../../../../style/colors';
 
 import {styles} from './list-item.styles';
 
@@ -23,6 +24,7 @@ type Props = {
 
 export const ListItem: FC<Props> = appObserver(
   ({favouritesHandler, trackInfo}) => {
+    const theme = useColorScheme();
     const animationRef = useRef<
       Animatable.View &
         View & {
@@ -46,14 +48,23 @@ export const ListItem: FC<Props> = appObserver(
 
     return (
       <GestureDetector gesture={onDoubleTap}>
-        <View
+        <Animatable.View
+          animation={'fadeIn'}
+          duration={350}
           onStartShouldSetResponder={() => true}
           style={styles.coverWrapper}>
-          <View style={styles.innerWrapper}>
+          <View
+            style={[
+              styles.innerWrapper,
+              {
+                backgroundColor: getColors(theme, Colors.background),
+                shadowColor: getColors(theme, Colors.label),
+              },
+            ]}>
             <Image style={styles.cover} source={{uri: trackInfo.artwork}} />
             <LikeAnimation isLiked={isTrackLiked} ref={animationRef} />
           </View>
-        </View>
+        </Animatable.View>
       </GestureDetector>
     );
   },

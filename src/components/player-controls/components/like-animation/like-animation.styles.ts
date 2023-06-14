@@ -6,6 +6,7 @@ export const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.1)',
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 8,
   },
   initialOpacity: {opacity: 0},
 });

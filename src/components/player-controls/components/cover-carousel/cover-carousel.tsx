@@ -5,11 +5,12 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import {Dimensions, View, FlatList, ViewToken} from 'react-native';
+import {View, FlatList, ViewToken} from 'react-native';
 import TrackPlayer from 'react-native-track-player';
 
 import {ListItem} from './components/list-item';
 import {TrackType} from '../../../../data/types';
+import {CAROUSEL_ITEM_WIDTH} from './components/list-item/list-item.styles';
 
 import {styles} from './cover-carousel.styles';
 
@@ -51,8 +52,8 @@ export const CoverCarousel = forwardRef(
     const getItemLayout = useCallback(
       (_data: TrackType[] | null | undefined, index: number) => {
         return {
-          length: Dimensions.get('screen').width - 40,
-          offset: (Dimensions.get('screen').width - 40) * index,
+          length: CAROUSEL_ITEM_WIDTH,
+          offset: CAROUSEL_ITEM_WIDTH * index,
           index,
         };
       },
@@ -76,7 +77,6 @@ export const CoverCarousel = forwardRef(
           onLayout={onLayout}
           renderItem={renderItem}
           keyExtractor={keyExtractor}
-          initialNumToRender={data.length}
           onViewableItemsChanged={onViewableItemsChanged}
           viewabilityConfig={{
             itemVisiblePercentThreshold: 50,
