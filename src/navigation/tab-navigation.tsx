@@ -1,11 +1,10 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {
   ColorSchemeName,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  useColorScheme,
 } from 'react-native';
 import {
   BottomTabBarProps,
@@ -16,10 +15,13 @@ import {BottomControls} from '../components/bottom-controls';
 
 import {Main} from '../screens/main';
 import {Favourites} from '../screens/favourites';
+import {Profile} from '../screens/profile';
 import {Icon, IconType} from '../components/icon';
 import {routes} from './routes';
 import {appObserver} from '../state-management/utils';
 import {favouritesListState} from '../state-management';
+import {ThemeContext} from '../context/theme-context/theme-context';
+import {ThemeContextType} from '../context/theme-context/theme-context.types';
 
 import {Colors, getColors} from '../style/colors';
 
@@ -27,11 +29,12 @@ type ControlType = {
   index: number;
   name: string;
   iconProps: {
-    type: IconType;
+    type: keyof typeof IconType;
     activeIconName: string;
     inactiveIconName: string;
   };
   withFavouritesBadge?: boolean;
+  component: any;
 };
 
 const controls: ControlType[] = [
@@ -43,6 +46,7 @@ const controls: ControlType[] = [
       activeIconName: 'playlist',
       inactiveIconName: 'playlist',
     },
+    component: Main,
   },
   {
     index: 1,
@@ -53,21 +57,36 @@ const controls: ControlType[] = [
       inactiveIconName: 'favorite-outline',
     },
     withFavouritesBadge: true,
+    component: Favourites,
+  },
+
+  {
+    index: 2,
+    name: routes.profile,
+    iconProps: {
+      type: IconType.FontAwesome,
+      activeIconName: 'user-circle',
+      inactiveIconName: 'user-circle-o',
+    },
+    component: Profile,
   },
 ];
 
 const Tab = createBottomTabNavigator();
 
 export const TabNavigation = () => {
-  const theme = useColorScheme();
+  const {theme} = useContext(ThemeContext) as ThemeContextType;
 
   return (
     <Tab.Navigator
       // eslint-disable-next-line react/no-unstable-nested-components
       tabBar={props => <TabBar theme={theme} {...props} />}
       screenOptions={{headerShown: false}}>
-      <Tab.Screen name={routes.main} component={Main} />
-      <Tab.Screen name={routes.favourite} component={Favourites} />
+      {controls.map(c => {
+        return (
+          <Tab.Screen key={c.index} name={c.name} component={c.component} />
+        );
+      })}
     </Tab.Navigator>
   );
 };
@@ -113,7 +132,7 @@ const TabBarControl = appObserver(
     isActive: boolean;
     onPress: () => void;
   }) => {
-    const theme = useColorScheme();
+    const {theme} = useContext(ThemeContext) as ThemeContextType;
 
     return (
       <TouchableOpacity

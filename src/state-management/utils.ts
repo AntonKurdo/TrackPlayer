@@ -10,7 +10,7 @@ export {
   action as appAction,
   toJS as appToJS,
 } from 'mobx';
-export {observer as appObserver} from 'mobx-react';
+export {observer as appObserver, Observer as AppObserver} from 'mobx-react';
 
 export const appMakeObservable = <T>(
   target: T,

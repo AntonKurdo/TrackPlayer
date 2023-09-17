@@ -1,8 +1,10 @@
-import React, {FC} from 'react';
-import {Text, View, useColorScheme} from 'react-native';
+import React, {FC, useContext} from 'react';
+import {Text, View} from 'react-native';
 
 import {styles} from './header.styles';
 import {Colors, getColors} from '../../style/colors';
+import {ThemeContext} from '../../context/theme-context/theme-context';
+import {ThemeContextType} from '../../context/theme-context/theme-context.types';
 
 type Props = {
   title?: string;
@@ -10,7 +12,7 @@ type Props = {
 };
 
 export const Header: FC<Props> = ({title, headerRight}) => {
-  const theme = useColorScheme();
+  const {theme} = useContext(ThemeContext) as ThemeContextType;
 
   return (
     <View

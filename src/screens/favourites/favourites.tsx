@@ -1,5 +1,5 @@
-import React, {useCallback, useMemo, useState} from 'react';
-import {SafeAreaView, View, useColorScheme} from 'react-native';
+import React, {useCallback, useContext, useMemo, useState} from 'react';
+import {SafeAreaView, View} from 'react-native';
 
 import {PlayerList} from '../../components/player-list';
 import {Colors, getColors} from '../../style/colors';
@@ -11,9 +11,11 @@ import {styles} from './favourites.styles';
 import {IconButton} from '../../components/icon-button';
 import {Icon} from '../../components/icon';
 import TrackPlayer from 'react-native-track-player';
+import {ThemeContext} from '../../context/theme-context/theme-context';
+import {ThemeContextType} from '../../context/theme-context/theme-context.types';
 
 export const Favourites = appObserver(() => {
-  const theme = useColorScheme();
+  const {theme} = useContext(ThemeContext) as ThemeContextType;
 
   const [isDragActive, setDragActive] = useState(false);
 

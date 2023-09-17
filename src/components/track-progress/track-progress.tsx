@@ -1,10 +1,12 @@
-import React, {useMemo, useCallback, FC} from 'react';
-import {View, useColorScheme, Text, ViewStyle} from 'react-native';
+import React, {useMemo, useCallback, FC, useContext} from 'react';
+import {View, Text, ViewStyle} from 'react-native';
 import TrackPlayer, {useProgress} from 'react-native-track-player';
 import {Slider} from '@miblanchard/react-native-slider';
 
 import {Colors, getColors} from '../../style/colors';
 import {formatTime} from '../../utils/time';
+import {ThemeContext} from '../../context/theme-context/theme-context';
+import {ThemeContextType} from '../../context/theme-context/theme-context.types';
 
 import {styles} from './track-progress.styles';
 
@@ -26,8 +28,7 @@ export const TrackProgress: FC<Props> = ({
   maximumTrackTintColor,
 }) => {
   const progress = useProgress();
-
-  const theme = useColorScheme();
+  const {theme} = useContext(ThemeContext) as ThemeContextType;
 
   const seekTo = useCallback((value: number[]) => {
     TrackPlayer.seekTo(value[0]);

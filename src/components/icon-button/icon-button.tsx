@@ -1,12 +1,9 @@
-import React, {FC} from 'react';
-import {
-  StyleProp,
-  TouchableOpacity,
-  ViewStyle,
-  useColorScheme,
-} from 'react-native';
+import React, {FC, useContext} from 'react';
+import {StyleProp, TouchableOpacity, ViewStyle} from 'react-native';
 
 import {Colors, getColors} from '../../style/colors';
+import {ThemeContext} from '../../context/theme-context/theme-context';
+import {ThemeContextType} from '../../context/theme-context/theme-context.types';
 
 import {styles} from './icon-button.styles';
 
@@ -25,7 +22,7 @@ export const IconButton: FC<IconButtonProps> = ({
   containerStyle,
   disabled,
 }) => {
-  const theme = useColorScheme();
+  const {theme} = useContext(ThemeContext) as ThemeContextType;
 
   return (
     <TouchableOpacity

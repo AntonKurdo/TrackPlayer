@@ -1,9 +1,5 @@
-import React, {FC, useState} from 'react';
-import {useColorScheme} from 'react-native';
-// import {useWindowDimensions} from 'react-native';
-// import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, {FC, useContext, useState} from 'react';
 import Animated, {
-  // cancelAnimation,
   runOnJS,
   useAnimatedGestureHandler,
   useAnimatedReaction,
@@ -14,6 +10,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import {PanGestureHandler} from 'react-native-gesture-handler';
 
+import {ThemeContext} from '../../../../context/theme-context/theme-context';
+import {ThemeContextType} from '../../../../context/theme-context/theme-context.types';
 import {Icon} from '../../../icon';
 import {ListItem} from '../list-item';
 import {clamp, objectMove} from './utils';
@@ -49,7 +47,7 @@ export const MovableTrack: FC<Props> = ({
   isDragActive,
   onDragComplete,
 }) => {
-  const theme = useColorScheme();
+  const {theme} = useContext(ThemeContext) as ThemeContextType;
   const [moving, setMoving] = useState(false);
   // const dimensions = useWindowDimensions();
 

@@ -1,11 +1,17 @@
-import React, {FC, useEffect, useRef, useState, useCallback} from 'react';
+import React, {
+  FC,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useContext,
+} from 'react';
 import {
   ActivityIndicator,
   GestureResponderEvent,
   Image,
   Text,
   View,
-  useColorScheme,
 } from 'react-native';
 import TrackPlayer, {
   Event,
@@ -14,6 +20,8 @@ import TrackPlayer, {
 } from 'react-native-track-player';
 import * as Animatable from 'react-native-animatable';
 
+import {ThemeContextType} from '../../context/theme-context/theme-context.types';
+import {ThemeContext} from '../../context/theme-context/theme-context';
 import {Storage} from '../../services/storage';
 import {playerModalState} from '../../state-management';
 import {appObserver} from '../../state-management/utils';
@@ -27,7 +35,7 @@ import {styles} from './bottom-controls.styles';
 export const BottomControls: FC = appObserver(() => {
   const touchX = useRef(0);
 
-  const theme = useColorScheme();
+  const {theme} = useContext(ThemeContext) as ThemeContextType;
 
   const [playbackState, setPlaybackState] = useState(State.Ready);
 

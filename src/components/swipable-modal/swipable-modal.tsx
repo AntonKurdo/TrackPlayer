@@ -1,9 +1,11 @@
-import React, {FC} from 'react';
-import {View, useColorScheme} from 'react-native';
+import React, {FC, useContext} from 'react';
+import {View} from 'react-native';
 import Modal from 'react-native-modal';
 
 import {Colors, getColors} from '../../style/colors';
 import {appObserver} from '../../state-management/utils';
+import {ThemeContext} from '../../context/theme-context/theme-context';
+import {ThemeContextType} from '../../context/theme-context/theme-context.types';
 
 import {styles} from './swipable-modal.styles';
 
@@ -23,7 +25,7 @@ export const SwipableModal: FC<Props> = appObserver(
     useNativeDriverForBackdrop,
     children,
   }) => {
-    const theme = useColorScheme();
+    const {theme} = useContext(ThemeContext) as ThemeContextType;
 
     return (
       <Modal

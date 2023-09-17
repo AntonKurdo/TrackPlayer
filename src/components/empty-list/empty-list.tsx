@@ -1,13 +1,16 @@
-import React from 'react';
-import {Image, View, Text, useColorScheme} from 'react-native';
+import React, {useContext} from 'react';
+import {Image, View, Text} from 'react-native';
+
+import {ThemeContext} from '../../context/theme-context/theme-context';
+import {ThemeContextType} from '../../context/theme-context/theme-context.types';
+import {Colors, getColors} from '../../style/colors';
 
 import {styles} from './empty-list.styles';
-import {Colors, getColors} from '../../style/colors';
 
 const emptyImage = require('../../assets/images/empty-folder.png');
 
 export const EmptyList = () => {
-  const theme = useColorScheme();
+  const {theme} = useContext(ThemeContext) as ThemeContextType;
   return (
     <View style={styles.container}>
       <Text

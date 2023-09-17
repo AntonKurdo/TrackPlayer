@@ -1,12 +1,12 @@
-import React, {FC, useCallback, useEffect, useState, useMemo} from 'react';
-import {
-  View,
-  Image,
-  Text,
-  useColorScheme,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import React, {
+  FC,
+  useCallback,
+  useEffect,
+  useState,
+  useMemo,
+  useContext,
+} from 'react';
+import {View, Image, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import TrackPlayer, {
   Event,
   State,
@@ -15,6 +15,8 @@ import TrackPlayer, {
 import * as Animatable from 'react-native-animatable';
 import Animated, {useAnimatedStyle, withTiming} from 'react-native-reanimated';
 
+import {ThemeContext} from '../../../../context/theme-context/theme-context';
+import {ThemeContextType} from '../../../../context/theme-context/theme-context.types';
 import {SwipeableButton} from '../../../swipeable-button';
 import favouritesList from '../../../../state-management/state/favourites-list';
 import {TrackType} from '../../../../data/types';
@@ -38,7 +40,7 @@ export const ListItem: FC<ListItemProps> = ({
   DragAreaComponent,
   isDragActive,
 }) => {
-  const theme = useColorScheme();
+  const {theme} = useContext(ThemeContext) as ThemeContextType;
 
   const [playedNow, setPlayedNow] = useState(false);
 

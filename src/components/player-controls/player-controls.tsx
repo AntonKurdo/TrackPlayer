@@ -5,9 +5,9 @@ import React, {
   FC,
   useRef,
   useMemo,
+  useContext,
 } from 'react';
 import {
-  ColorSchemeName,
   FlatList,
   Text,
   TouchableWithoutFeedback,
@@ -22,6 +22,8 @@ import TrackPlayer, {
 } from 'react-native-track-player';
 import * as Animatable from 'react-native-animatable';
 
+import {ThemeContext} from '../../context/theme-context/theme-context';
+import {ThemeContextType} from '../../context/theme-context/theme-context.types';
 import {TrackType} from '../../data/types';
 import {Colors, getColors} from '../../style/colors';
 import {IconButton} from '../icon-button';
@@ -39,11 +41,11 @@ import {styles} from './player-controls.styles';
 type PlayerControlsType = {
   isVisible: boolean;
   onClose: () => void;
-  theme: ColorSchemeName;
 };
 
 export const PlayerControls: FC<PlayerControlsType> = appObserver(
-  ({isVisible, onClose, theme}) => {
+  ({isVisible, onClose}) => {
+    const {theme} = useContext(ThemeContext) as ThemeContextType;
     const coversListRef = useRef<FlatList<TrackType>>(null);
     const currentCoverIndex = useRef<number | null>(null);
     const likeRef = useRef<

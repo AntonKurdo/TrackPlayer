@@ -1,5 +1,5 @@
-import React, {FC, useMemo, useRef} from 'react';
-import {Image, View, useColorScheme} from 'react-native';
+import React, {FC, useContext, useMemo, useRef} from 'react';
+import {Image, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {useUpdateEffect} from 'react-use';
@@ -14,6 +14,8 @@ import {
 import {favouritesListState} from '../../../../../../state-management';
 import {zoomOutAnimation} from '../../../../../../utils/animation';
 import {Colors, getColors} from '../../../../../../style/colors';
+import {ThemeContext} from '../../../../../../context/theme-context/theme-context';
+import {ThemeContextType} from '../../../../../../context/theme-context/theme-context.types';
 
 import {styles} from './list-item.styles';
 
@@ -24,7 +26,7 @@ type Props = {
 
 export const ListItem: FC<Props> = appObserver(
   ({favouritesHandler, trackInfo}) => {
-    const theme = useColorScheme();
+    const {theme} = useContext(ThemeContext) as ThemeContextType;
     const animationRef = useRef<
       Animatable.View &
         View & {
