@@ -59,7 +59,6 @@ const controls: ControlType[] = [
     withFavouritesBadge: true,
     component: Favourites,
   },
-
   {
     index: 2,
     name: routes.profile,

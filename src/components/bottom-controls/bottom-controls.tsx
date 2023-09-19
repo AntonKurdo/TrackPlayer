@@ -35,7 +35,9 @@ import {styles} from './bottom-controls.styles';
 export const BottomControls: FC = appObserver(() => {
   const touchX = useRef(0);
 
-  const {theme} = useContext(ThemeContext) as ThemeContextType;
+  const {theme, isThemeAnimationActive} = useContext(
+    ThemeContext,
+  ) as ThemeContextType;
 
   const [playbackState, setPlaybackState] = useState(State.Ready);
 
@@ -113,7 +115,10 @@ export const BottomControls: FC = appObserver(() => {
           touchX.current - evt.nativeEvent.pageX < 10 &&
           touchX.current - evt.nativeEvent.pageX > -10
         ) {
-          openModal();
+          if (!isThemeAnimationActive) {
+            openModal();
+          }
+
           touchX.current = 0;
           return;
         }
@@ -146,7 +151,7 @@ export const BottomControls: FC = appObserver(() => {
         console.error({error});
       }
     },
-    [openModal],
+    [openModal, isThemeAnimationActive],
   );
 
   return (
