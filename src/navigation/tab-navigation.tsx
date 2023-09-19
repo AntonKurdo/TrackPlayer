@@ -1,5 +1,6 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useRef} from 'react';
 import {
+  Animated,
   ColorSchemeName,
   StyleSheet,
   Text,
@@ -8,22 +9,29 @@ import {
 } from 'react-native';
 import {
   BottomTabBarProps,
+  BottomTabNavigationOptions,
   createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs';
 
 import {BottomControls} from '../components/bottom-controls';
 
+// SCREENS
 import {Main} from '../screens/main';
 import {Favourites} from '../screens/favourites';
 import {Profile} from '../screens/profile';
-import {Icon, IconType} from '../components/icon';
+import {SkiaPixelatedImage} from '../screens/skia-pixelated-image';
+
 import {routes} from './routes';
+import {Icon, IconType} from '../components/icon';
 import {appObserver} from '../state-management/utils';
 import {favouritesListState} from '../state-management';
 import {ThemeContext} from '../context/theme-context/theme-context';
 import {ThemeContextType} from '../context/theme-context/theme-context.types';
 
 import {Colors, getColors} from '../style/colors';
+
+const BOTTOM_BAR_HEIGHT = 120;
+const BOTTOM_BAR_ANIMATION_DURATION = 300;
 
 type ControlType = {
   index: number;
@@ -69,6 +77,16 @@ const controls: ControlType[] = [
     },
     component: Profile,
   },
+  {
+    index: 3,
+    name: routes.skia,
+    iconProps: {
+      type: IconType.MaterialCommunity,
+      activeIconName: 'file-image',
+      inactiveIconName: 'file-image-outline',
+    },
+    component: SkiaPixelatedImage,
+  },
 ];
 
 const Tab = createBottomTabNavigator();
@@ -80,7 +98,9 @@ export const TabNavigation = () => {
     <Tab.Navigator
       // eslint-disable-next-line react/no-unstable-nested-components
       tabBar={props => <TabBar theme={theme} {...props} />}
-      screenOptions={{headerShown: false}}>
+      screenOptions={{
+        headerShown: false,
+      }}>
       {controls.map(c => {
         return (
           <Tab.Screen key={c.index} name={c.name} component={c.component} />
@@ -90,16 +110,51 @@ export const TabNavigation = () => {
   );
 };
 
+type BottomTabBarVisibleProps = {
+  tabBarVisible: boolean;
+};
+
 const TabBar = ({
   state,
   navigation,
   theme,
+  descriptors,
 }: BottomTabBarProps & {theme: ColorSchemeName}) => {
+  const focusedOptions = descriptors[state.routes[state.index].key]
+    .options as BottomTabNavigationOptions & BottomTabBarVisibleProps;
+
+  const animHeight = useRef(new Animated.Value(BOTTOM_BAR_HEIGHT)).current;
+
+  useEffect(() => {
+    if (!focusedOptions.hasOwnProperty('tabBarVisible')) {
+      return;
+    }
+
+    if (focusedOptions?.tabBarVisible) {
+      Animated.timing(animHeight, {
+        toValue: BOTTOM_BAR_HEIGHT,
+        duration: BOTTOM_BAR_ANIMATION_DURATION,
+        useNativeDriver: false,
+      }).start();
+    } else {
+      Animated.timing(animHeight, {
+        toValue: 0,
+        duration: BOTTOM_BAR_ANIMATION_DURATION,
+        useNativeDriver: false,
+      }).start();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusedOptions]);
+
   const onPressHandler = (route: string) => {
     navigation.navigate(route);
   };
+
   return (
-    <>
+    <Animated.View
+      style={{
+        height: animHeight,
+      }}>
       <BottomControls />
       <View
         style={[
@@ -117,7 +172,7 @@ const TabBar = ({
           />
         ))}
       </View>
-    </>
+    </Animated.View>
   );
 };
 

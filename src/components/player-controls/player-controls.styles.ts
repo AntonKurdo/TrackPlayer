@@ -42,5 +42,5 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     alignItems: 'center',
   },
-  paddingWrapper: {paddingHorizontal: 20},
+  paddingWrapper: {paddingHorizontal: 20, marginVertical: 8},
 });

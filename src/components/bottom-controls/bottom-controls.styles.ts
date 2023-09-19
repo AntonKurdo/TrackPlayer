@@ -40,7 +40,7 @@ export const styles = StyleSheet.create({
   progressContainer: {
     height: 0,
     position: 'absolute',
-    top: -9,
+    top: 2,
     zIndex: 1,
   },
   sliderStyles: {width: Dimensions.get('window').width, height: 0},
