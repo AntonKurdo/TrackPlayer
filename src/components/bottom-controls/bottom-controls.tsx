@@ -155,10 +155,7 @@ export const BottomControls: FC = appObserver(() => {
   );
 
   return (
-    <Animatable.View
-      useNativeDriver
-      duration={300}
-      animation={'slideInUp'}
+    <View
       onTouchStart={!loading ? onTouchStart : undefined}
       onTouchEnd={!loading ? onTouchEnd : undefined}>
       <TrackProgress
@@ -227,6 +224,6 @@ export const BottomControls: FC = appObserver(() => {
           </Animatable.View>
         )}
       </View>
-    </Animatable.View>
+    </View>
   );
 });

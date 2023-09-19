@@ -15,8 +15,6 @@ import {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-
-import {ThemeContextType} from './theme-context.types';
 import {
   ColorSchemeName,
   Dimensions,
@@ -24,9 +22,13 @@ import {
   StatusBar,
   StyleSheet,
   View,
+  useColorScheme,
 } from 'react-native';
+
 import {appObserver} from '../../state-management/utils';
 import {wait} from '../../utils/system';
+import {Storage} from '../../services/storage';
+import {ThemeContextType} from './theme-context.types';
 
 const {width, height} = Dimensions.get('screen');
 
@@ -36,7 +38,12 @@ export const ThemeContext = React.createContext<ThemeContextType | null>(null);
 
 const ThemeProvider: React.FC<{children: React.ReactNode}> = appObserver(
   ({children}) => {
-    const [theme, setTheme] = useState<ColorSchemeName>('dark');
+    const systemColorScheme = useColorScheme();
+
+    const [theme, setTheme] = useState<ColorSchemeName>(
+      (Storage.getString(Storage.storageKeys.theme) as ColorSchemeName) ||
+        systemColorScheme,
+    );
 
     const [isThemeAnimationActive, setAnimationActive] = useState(false);
 
@@ -52,14 +59,20 @@ const ThemeProvider: React.FC<{children: React.ReactNode}> = appObserver(
 
     const ref = useRef(null);
 
+    const updateTheme = useCallback(() => {
+      if (theme === 'dark') {
+        setTheme('light');
+        Storage.setString(Storage.storageKeys.theme, 'light');
+      } else {
+        setTheme('dark');
+        Storage.setString(Storage.storageKeys.theme, 'dark');
+      }
+    }, [theme]);
+
     const toggleTheme = useCallback(
       async ({x, y}: {x: number; y: number}) => {
         if (Platform.OS === 'android') {
-          if (theme === 'dark') {
-            setTheme('light');
-          } else {
-            setTheme('dark');
-          }
+          updateTheme();
         }
 
         if (Platform.OS === 'ios') {
@@ -71,11 +84,7 @@ const ThemeProvider: React.FC<{children: React.ReactNode}> = appObserver(
           };
           setOverlay1(await makeImageFromView(ref));
 
-          if (theme === 'dark') {
-            setTheme('light');
-          } else {
-            setTheme('dark');
-          }
+          updateTheme();
 
           await wait(50);
           setOverlay2(await makeImageFromView(ref));
@@ -89,7 +98,7 @@ const ThemeProvider: React.FC<{children: React.ReactNode}> = appObserver(
           setAnimationActive(false);
         }
       },
-      [circle, theme, transition],
+      [circle, transition, updateTheme],
     );
 
     return (
