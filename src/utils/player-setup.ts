@@ -19,7 +19,7 @@ export const setupInitialRepeatMode = async () => {
   const mode = Storage.getInt(Storage.storageKeys.repeatMode);
 
   if (mode) {
-    TrackPlayer.setRepeatMode(mode);
+    await TrackPlayer.setRepeatMode(mode);
   } else {
     Storage.setInt(Storage.storageKeys.repeatMode, RepeatMode.Off);
   }

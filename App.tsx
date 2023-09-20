@@ -12,7 +12,10 @@ import {Splash} from './src/screens/splash';
 import {PlayerControls} from './src/components/player-controls';
 import {appObserver} from './src/state-management/utils';
 import {playerModalState} from './src/state-management';
-import {setupInitialTrack} from './src/utils/player-setup';
+import {
+  setupInitialTrack,
+  setupInitialRepeatMode,
+} from './src/utils/player-setup';
 import ThemeProvider from './src/context/theme-context/theme-context';
 
 LogBox.ignoreLogs([
@@ -22,6 +25,8 @@ LogBox.ignoreLogs([
 const App = appObserver((): JSX.Element => {
   const [appInit, setAppInit] = useState(true);
 
+  const [initAnimationFinished, setInitAnimationFinished] = useState(false);
+
   const closeModal = useCallback(() => playerModalState.closeModal(), []);
 
   useEffect(() => {
@@ -30,22 +35,22 @@ const App = appObserver((): JSX.Element => {
         await TrackPlayer.setupPlayer();
         await TrackPlayer.add(data);
 
-        setupInitialTrack();
-        setupInitialTrack();
-
-        setAppInit(false);
+        await setupInitialTrack();
+        await setupInitialRepeatMode();
       } catch (error) {
         console.error({error});
+      } finally {
+        setAppInit(false);
       }
     };
 
     setupPlayer();
   }, []);
 
-  if (appInit) {
+  if (appInit || !initAnimationFinished) {
     return (
       <ThemeProvider>
-        <Splash />
+        <Splash onAnimationFinish={() => setInitAnimationFinished(true)} />
       </ThemeProvider>
     );
   }

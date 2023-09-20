@@ -6,6 +6,6 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  iconStyles: {width: 180, height: 180},
+  iconStyles: {width: 250, height: 250},
   label: {fontSize: 20, fontWeight: '500'},
 });
