@@ -1,10 +1,9 @@
-import React, {FC, useContext} from 'react';
+import React from 'react';
 import {View} from 'react-native';
 import LottieView from 'lottie-react-native';
 
+import {withTheme} from '../../hocs/with-theme';
 import {Colors, getColors} from '../../style/colors';
-import {ThemeContext} from '../../context/theme-context/theme-context';
-import {ThemeContextType} from '../../context/theme-context/theme-context.types';
 
 import {styles} from './splash.styles';
 
@@ -12,9 +11,7 @@ type Props = {
   onAnimationFinish: () => void;
 };
 
-export const Splash: FC<Props> = ({onAnimationFinish}) => {
-  const {theme} = useContext(ThemeContext) as ThemeContextType;
-
+export const Splash = withTheme<Props>(({onAnimationFinish, theme}) => {
   return (
     <View
       style={[
@@ -33,4 +30,4 @@ export const Splash: FC<Props> = ({onAnimationFinish}) => {
       />
     </View>
   );
-};
+});

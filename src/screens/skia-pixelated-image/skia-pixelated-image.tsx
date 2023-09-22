@@ -1,23 +1,19 @@
-import React, {FC, useContext} from 'react';
+import React from 'react';
 import {View, useWindowDimensions} from 'react-native';
 
-import {styles} from './skia-pixelated-image.styles';
+import {withTheme} from '../../hocs/with-theme';
 import {Colors, getColors} from '../../style/colors';
-import {ThemeContext} from '../../context/theme-context/theme-context';
-import {ThemeContextType} from '../../context/theme-context/theme-context.types';
 import {Canvas, Drawing, Skia, useImage} from '@shopify/react-native-skia';
 import {makeImageParticles} from './skia-pixelated-image.utils';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
 
+import {styles} from './skia-pixelated-image.styles';
+
 const FRICTION = 0.88;
 const MOVE_SPEED = 0.88;
 
-type Props = {};
-
-export const SkiaPixelatedImage: FC<Props> = () => {
-  const {theme} = useContext(ThemeContext) as ThemeContextType;
-
+export const SkiaPixelatedImage = withTheme(({theme}) => {
   const {setOptions} = useNavigation();
 
   const {width: stageWidth, height: stageHeight} = useWindowDimensions();
@@ -99,4 +95,4 @@ export const SkiaPixelatedImage: FC<Props> = () => {
       </GestureDetector>
     </View>
   );
-};
+});

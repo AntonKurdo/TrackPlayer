@@ -1,19 +1,17 @@
-import React, {FC, useContext} from 'react';
+import React from 'react';
 import {Text, View} from 'react-native';
 
-import {styles} from './header.styles';
+import {withTheme} from '../../hocs/with-theme';
 import {Colors, getColors} from '../../style/colors';
-import {ThemeContext} from '../../context/theme-context/theme-context';
-import {ThemeContextType} from '../../context/theme-context/theme-context.types';
+
+import {styles} from './header.styles';
 
 type Props = {
   title?: string;
   headerRight?: React.ReactNode;
 };
 
-export const Header: FC<Props> = ({title, headerRight}) => {
-  const {theme} = useContext(ThemeContext) as ThemeContextType;
-
+export const Header = withTheme<Props>(({theme, title, headerRight}) => {
   return (
     <View
       style={[
@@ -36,4 +34,4 @@ export const Header: FC<Props> = ({title, headerRight}) => {
       {headerRight && <View style={styles.headerRight}>{headerRight}</View>}
     </View>
   );
-};
+});

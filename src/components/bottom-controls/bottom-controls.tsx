@@ -1,11 +1,4 @@
-import React, {
-  FC,
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-  useContext,
-} from 'react';
+import React, {useEffect, useRef, useState, useCallback} from 'react';
 import {
   ActivityIndicator,
   GestureResponderEvent,
@@ -20,8 +13,7 @@ import TrackPlayer, {
 } from 'react-native-track-player';
 import * as Animatable from 'react-native-animatable';
 
-import {ThemeContextType} from '../../context/theme-context/theme-context.types';
-import {ThemeContext} from '../../context/theme-context/theme-context';
+import {withTheme} from '../../hocs/with-theme';
 import {Storage} from '../../services/storage';
 import {playerModalState} from '../../state-management';
 import {appObserver} from '../../state-management/utils';
@@ -32,198 +24,209 @@ import {Icon} from '../icon';
 
 import {styles} from './bottom-controls.styles';
 
-export const BottomControls: FC = appObserver(() => {
-  const touchX = useRef(0);
+export const BottomControls = appObserver(
+  withTheme(({theme, isThemeAnimationActive}) => {
+    const touchX = useRef(0);
 
-  const {theme, isThemeAnimationActive} = useContext(
-    ThemeContext,
-  ) as ThemeContextType;
+    const [playbackState, setPlaybackState] = useState(State.Ready);
 
-  const [playbackState, setPlaybackState] = useState(State.Ready);
+    const [trackInfo, setTrackInfo] = useState<TrackType | undefined>(
+      undefined,
+    );
 
-  const [trackInfo, setTrackInfo] = useState<TrackType | undefined>(undefined);
+    const [loading, setLoading] = useState(true);
 
-  const [loading, setLoading] = useState(true);
+    const animatableTitle = useRef<Animatable.View & View>(null);
 
-  const animatableTitle = useRef<Animatable.View & View>(null);
+    const openModal = useCallback(() => playerModalState.openModel(), []);
 
-  const openModal = useCallback(() => playerModalState.openModel(), []);
+    useEffect(() => {
+      TrackPlayer.getCurrentTrack()
+        .then(async track => {
+          const currentTrack = await TrackPlayer.getTrack(track as number);
 
-  useEffect(() => {
-    TrackPlayer.getCurrentTrack()
-      .then(async track => {
-        const currentTrack = await TrackPlayer.getTrack(track as number);
+          setTrackInfo(currentTrack as TrackType);
 
-        setTrackInfo(currentTrack as TrackType);
+          const state = await TrackPlayer.getState();
 
-        const state = await TrackPlayer.getState();
+          setPlaybackState(state);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }, []);
 
-        setPlaybackState(state);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
-
-  useTrackPlayerEvents(
-    [Event.PlaybackTrackChanged, Event.PlaybackState],
-    async event => {
-      if (
-        event.type === Event.PlaybackTrackChanged &&
-        event.nextTrack != null
-      ) {
-        const track = await TrackPlayer.getTrack(event.nextTrack);
-
-        if (track) {
-          setTrackInfo(track as TrackType);
-          Storage.setInt(Storage.storageKeys.lastTrackId, track.id);
-        }
-      }
-      if (event.type === Event.PlaybackState && event.state === State.Playing) {
-        setPlaybackState(event.state);
-      }
-      if (event.type === Event.PlaybackState && event.state === State.Paused) {
-        setPlaybackState(event.state);
-      }
-    },
-  );
-
-  const onTouchEndButton = useCallback(
-    (evt: GestureResponderEvent) => {
-      if (playbackState !== State.Playing) {
-        TrackPlayer.play();
-      } else {
-        TrackPlayer.pause();
-      }
-
-      evt.stopPropagation();
-    },
-    [playbackState],
-  );
-
-  const onTouchStart = useCallback((evt: GestureResponderEvent) => {
-    touchX.current = evt.nativeEvent.pageX;
-  }, []);
-
-  const onTouchEnd = useCallback(
-    async (evt: GestureResponderEvent) => {
-      evt.persist();
-      try {
-        const track = await TrackPlayer.getCurrentTrack();
-        const queue = await TrackPlayer.getQueue();
+    useTrackPlayerEvents(
+      [Event.PlaybackTrackChanged, Event.PlaybackState],
+      async event => {
         if (
-          touchX.current - evt.nativeEvent.pageX < 10 &&
-          touchX.current - evt.nativeEvent.pageX > -10
+          event.type === Event.PlaybackTrackChanged &&
+          event.nextTrack != null
         ) {
-          if (!isThemeAnimationActive) {
-            openModal();
+          const track = await TrackPlayer.getTrack(event.nextTrack);
+
+          if (track) {
+            setTrackInfo(track as TrackType);
+            Storage.setInt(Storage.storageKeys.lastTrackId, track.id);
+          }
+        }
+        if (
+          event.type === Event.PlaybackState &&
+          event.state === State.Playing
+        ) {
+          setPlaybackState(event.state);
+        }
+        if (
+          event.type === Event.PlaybackState &&
+          event.state === State.Paused
+        ) {
+          setPlaybackState(event.state);
+        }
+      },
+    );
+
+    const onTouchEndButton = useCallback(
+      (evt: GestureResponderEvent) => {
+        if (playbackState !== State.Playing) {
+          TrackPlayer.play();
+        } else {
+          TrackPlayer.pause();
+        }
+
+        evt.stopPropagation();
+      },
+      [playbackState],
+    );
+
+    const onTouchStart = useCallback((evt: GestureResponderEvent) => {
+      touchX.current = evt.nativeEvent.pageX;
+    }, []);
+
+    const onTouchEnd = useCallback(
+      async (evt: GestureResponderEvent) => {
+        evt.persist();
+        try {
+          const track = await TrackPlayer.getCurrentTrack();
+          const queue = await TrackPlayer.getQueue();
+          if (
+            touchX.current - evt.nativeEvent.pageX < 10 &&
+            touchX.current - evt.nativeEvent.pageX > -10
+          ) {
+            if (!isThemeAnimationActive) {
+              openModal();
+            }
+
+            touchX.current = 0;
+            return;
           }
 
+          if (touchX.current - evt.nativeEvent.pageX < 0 && track !== 0) {
+            if (
+              animatableTitle.current &&
+              typeof animatableTitle.current.slideInLeft === 'function'
+            ) {
+              animatableTitle.current.slideInLeft(350);
+            }
+
+            await TrackPlayer.skipToPrevious();
+          }
+          if (
+            touchX.current - evt.nativeEvent.pageX > 0 &&
+            track !== queue.length - 1
+          ) {
+            if (
+              animatableTitle.current &&
+              typeof animatableTitle.current.slideInRight === 'function'
+            ) {
+              animatableTitle.current.slideInRight(350);
+            }
+
+            await TrackPlayer.skipToNext();
+          }
           touchX.current = 0;
-          return;
+        } catch (error) {
+          console.error({error});
         }
+      },
+      [openModal, isThemeAnimationActive],
+    );
 
-        if (touchX.current - evt.nativeEvent.pageX < 0 && track !== 0) {
-          if (
-            animatableTitle.current &&
-            typeof animatableTitle.current.slideInLeft === 'function'
-          ) {
-            animatableTitle.current.slideInLeft(350);
-          }
-
-          await TrackPlayer.skipToPrevious();
-        }
-        if (
-          touchX.current - evt.nativeEvent.pageX > 0 &&
-          track !== queue.length - 1
-        ) {
-          if (
-            animatableTitle.current &&
-            typeof animatableTitle.current.slideInRight === 'function'
-          ) {
-            animatableTitle.current.slideInRight(350);
-          }
-
-          await TrackPlayer.skipToNext();
-        }
-        touchX.current = 0;
-      } catch (error) {
-        console.error({error});
-      }
-    },
-    [openModal, isThemeAnimationActive],
-  );
-
-  return (
-    <View
-      onTouchStart={!loading ? onTouchStart : undefined}
-      onTouchEnd={!loading ? onTouchEnd : undefined}>
-      <TrackProgress
-        containerStyles={styles.progressContainer}
-        sliderStyles={styles.sliderStyles}
-        progressThumbStyles={styles.progressThumbStyles}
-        withTime={false}
-        minimumTrackTintColor={getColors(theme, Colors.yellow)}
-      />
+    return (
       <View
-        style={[
-          styles.container,
-          {
-            backgroundColor: getColors(theme, Colors.bottomControlsBackground),
-          },
-        ]}>
-        {loading ? (
-          <ActivityIndicator color={getColors(theme, Colors.yellow)} />
-        ) : (
-          <Animatable.View
-            style={styles.wrapper}
-            animation={'fadeIn'}
-            duration={1500}>
-            <View style={styles.innerWrapper}>
-              <View style={styles.buttonWrapper} onTouchEnd={onTouchEndButton}>
-                <Icon
-                  name={playbackState !== State.Playing ? 'play' : 'pause'}
-                  size={30}
-                  color={getColors(theme, Colors.bottomControlsLabel)}
-                />
+        onTouchStart={!loading ? onTouchStart : undefined}
+        onTouchEnd={!loading ? onTouchEnd : undefined}>
+        <TrackProgress
+          containerStyles={styles.progressContainer}
+          sliderStyles={styles.sliderStyles}
+          progressThumbStyles={styles.progressThumbStyles}
+          withTime={false}
+          minimumTrackTintColor={getColors(theme, Colors.yellow)}
+        />
+        <View
+          style={[
+            styles.container,
+            {
+              backgroundColor: getColors(
+                theme,
+                Colors.bottomControlsBackground,
+              ),
+            },
+          ]}>
+          {loading ? (
+            <ActivityIndicator color={getColors(theme, Colors.yellow)} />
+          ) : (
+            <Animatable.View
+              style={styles.wrapper}
+              animation={'fadeIn'}
+              duration={1500}>
+              <View style={styles.innerWrapper}>
+                <View
+                  style={styles.buttonWrapper}
+                  onTouchEnd={onTouchEndButton}>
+                  <Icon
+                    name={playbackState !== State.Playing ? 'play' : 'pause'}
+                    size={30}
+                    color={getColors(theme, Colors.bottomControlsLabel)}
+                  />
+                </View>
+                <View style={styles.animationWrapper}>
+                  <Animatable.View ref={animatableTitle}>
+                    <Text
+                      numberOfLines={1}
+                      style={[
+                        styles.artist,
+                        {
+                          color: getColors(theme, Colors.bottomControlsLabel),
+                        },
+                      ]}>
+                      {trackInfo?.artist}
+                    </Text>
+                    <Text
+                      numberOfLines={1}
+                      style={[
+                        styles.title,
+                        {
+                          color: getColors(theme, Colors.bottomControlsLabel),
+                        },
+                      ]}>
+                      {trackInfo?.title}
+                    </Text>
+                  </Animatable.View>
+                </View>
               </View>
-              <View style={styles.animationWrapper}>
-                <Animatable.View ref={animatableTitle}>
-                  <Text
-                    numberOfLines={1}
-                    style={[
-                      styles.artist,
-                      {
-                        color: getColors(theme, Colors.bottomControlsLabel),
-                      },
-                    ]}>
-                    {trackInfo?.artist}
-                  </Text>
-                  <Text
-                    numberOfLines={1}
-                    style={[
-                      styles.title,
-                      {
-                        color: getColors(theme, Colors.bottomControlsLabel),
-                      },
-                    ]}>
-                    {trackInfo?.title}
-                  </Text>
-                </Animatable.View>
-              </View>
-            </View>
-            <Image
-              style={[
-                styles.cover,
-                {
-                  borderColor: getColors(theme, Colors.bottomControlsLabel),
-                },
-              ]}
-              source={{uri: trackInfo?.artwork}}
-            />
-          </Animatable.View>
-        )}
+              <Image
+                style={[
+                  styles.cover,
+                  {
+                    borderColor: getColors(theme, Colors.bottomControlsLabel),
+                  },
+                ]}
+                source={{uri: trackInfo?.artwork}}
+              />
+            </Animatable.View>
+          )}
+        </View>
       </View>
-    </View>
-  );
-});
+    );
+  }),
+);

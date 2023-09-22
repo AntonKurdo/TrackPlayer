@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
   Animated,
   ColorSchemeName,
@@ -14,6 +14,7 @@ import {
 } from '@react-navigation/bottom-tabs';
 
 import {BottomControls} from '../components/bottom-controls';
+import {withTheme} from '../hocs/with-theme';
 
 // SCREENS
 import {Main} from '../screens/main';
@@ -25,13 +26,11 @@ import {routes} from './routes';
 import {Icon, IconType} from '../components/icon';
 import {appObserver} from '../state-management/utils';
 import {favouritesListState} from '../state-management';
-import {ThemeContext} from '../context/theme-context/theme-context';
-import {ThemeContextType} from '../context/theme-context/theme-context.types';
 
 import {Colors, getColors} from '../style/colors';
 
 const BOTTOM_BAR_HEIGHT = 120;
-const BOTTOM_BAR_ANIMATION_DURATION = 300;
+const BOTTOM_BAR_ANIMATION_DURATION = 290;
 
 type ControlType = {
   index: number;
@@ -91,9 +90,7 @@ const controls: ControlType[] = [
 
 const Tab = createBottomTabNavigator();
 
-export const TabNavigation = () => {
-  const {theme} = useContext(ThemeContext) as ThemeContextType;
-
+export const TabNavigation = withTheme(({theme}) => {
   return (
     <Tab.Navigator
       // eslint-disable-next-line react/no-unstable-nested-components
@@ -108,7 +105,7 @@ export const TabNavigation = () => {
       })}
     </Tab.Navigator>
   );
-};
+});
 
 type BottomTabBarVisibleProps = {
   tabBarVisible: boolean;
@@ -177,17 +174,11 @@ const TabBar = ({
 };
 
 const TabBarControl = appObserver(
-  ({
-    c,
-    isActive,
-    onPress,
-  }: {
+  withTheme<{
     c: ControlType;
     isActive: boolean;
     onPress: () => void;
-  }) => {
-    const {theme} = useContext(ThemeContext) as ThemeContextType;
-
+  }>(({c, isActive, onPress, theme}) => {
     return (
       <TouchableOpacity
         activeOpacity={0.7}
@@ -236,7 +227,7 @@ const TabBarControl = appObserver(
         </Text>
       </TouchableOpacity>
     );
-  },
+  }),
 );
 
 const styles = StyleSheet.create({

@@ -1,4 +1,4 @@
-import React, {FC, useContext, useState} from 'react';
+import React, {useState} from 'react';
 import Animated, {
   runOnJS,
   useAnimatedGestureHandler,
@@ -10,8 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import {PanGestureHandler} from 'react-native-gesture-handler';
 
-import {ThemeContext} from '../../../../context/theme-context/theme-context';
-import {ThemeContextType} from '../../../../context/theme-context/theme-context.types';
+import {withTheme} from '../../../../hocs/with-theme';
 import {Icon} from '../../../icon';
 import {ListItem} from '../list-item';
 import {clamp, objectMove} from './utils';
@@ -36,125 +35,127 @@ type Props = {
   onDragComplete?: () => void;
 };
 
-export const MovableTrack: FC<Props> = ({
-  track,
-  index,
-  withSweapable,
-  dataLength,
-  scrollY,
-  id,
-  positions,
-  isDragActive,
-  onDragComplete,
-}) => {
-  const {theme} = useContext(ThemeContext) as ThemeContextType;
-  const [moving, setMoving] = useState(false);
-  // const dimensions = useWindowDimensions();
+export const MovableTrack = withTheme<Props>(
+  ({
+    theme,
+    track,
+    index,
+    withSweapable,
+    dataLength,
+    scrollY,
+    id,
+    positions,
+    isDragActive,
+    onDragComplete,
+  }) => {
+    const [moving, setMoving] = useState(false);
+    // const dimensions = useWindowDimensions();
 
-  // const insets = useSafeAreaInsets();
+    // const insets = useSafeAreaInsets();
 
-  const top = useSharedValue(
-    (positions.value[id]?.index || index) * TRACK_HEIGHT,
-  );
+    const top = useSharedValue(
+      (positions.value[id]?.index || index) * TRACK_HEIGHT,
+    );
 
-  useAnimatedReaction(
-    () => positions.value[id],
-    (currentValue, previousValue) => {
-      if (currentValue?.index !== previousValue?.index) {
-        if (!moving) {
-          top.value = withSpring(currentValue.index * TRACK_HEIGHT);
+    useAnimatedReaction(
+      () => positions.value[id],
+      (currentValue, previousValue) => {
+        if (currentValue?.index !== previousValue?.index) {
+          if (!moving) {
+            top.value = withSpring(currentValue.index * TRACK_HEIGHT);
+          }
         }
-      }
-    },
-    [moving],
-  );
+      },
+      [moving],
+    );
 
-  const gestureHandler = useAnimatedGestureHandler({
-    onStart() {
-      runOnJS(setMoving)(true);
-    },
-    onActive(event) {
-      const positionY = event.absoluteY - HEADER_HEIGHT + scrollY.value;
+    const gestureHandler = useAnimatedGestureHandler({
+      onStart() {
+        runOnJS(setMoving)(true);
+      },
+      onActive(event) {
+        const positionY = event.absoluteY - HEADER_HEIGHT + scrollY.value;
 
-      // if (positionY <= scrollY.value + HEADER_HEIGHT + 100) {
-      //   // Scroll up
+        // if (positionY <= scrollY.value + HEADER_HEIGHT + 100) {
+        //   // Scroll up
 
-      //   scrollY.value = withTiming(0, {duration: 100});
-      // } else if (positionY >= scrollY.value + dimensions.height - 200) {
-      //   // Scroll down
+        //   scrollY.value = withTiming(0, {duration: 100});
+        // } else if (positionY >= scrollY.value + dimensions.height - 200) {
+        //   // Scroll down
 
-      //   const contentHeight = dataLength * TRACK_HEIGHT;
-      //   const containerHeight = dimensions.height - insets.top - insets.bottom;
-      //   const maxScroll = contentHeight - containerHeight;
-      //   scrollY.value = withTiming(maxScroll, {duration: 100});
-      // } else {
-      //   cancelAnimation(scrollY);
-      // }
+        //   const contentHeight = dataLength * TRACK_HEIGHT;
+        //   const containerHeight = dimensions.height - insets.top - insets.bottom;
+        //   const maxScroll = contentHeight - containerHeight;
+        //   scrollY.value = withTiming(maxScroll, {duration: 100});
+        // } else {
+        //   cancelAnimation(scrollY);
+        // }
 
-      top.value = withTiming(positionY - TRACK_HEIGHT, {
-        duration: 16,
-      });
+        top.value = withTiming(positionY - TRACK_HEIGHT, {
+          duration: 16,
+        });
 
-      const newPosition = clamp(
-        Math.floor(positionY / TRACK_HEIGHT),
-        0,
-        dataLength - 1,
-      );
-
-      if (newPosition !== positions.value[id]?.index) {
-        positions.value = objectMove(
-          positions.value,
-          positions.value[id]?.index,
-          newPosition,
+        const newPosition = clamp(
+          Math.floor(positionY / TRACK_HEIGHT),
+          0,
+          dataLength - 1,
         );
-      }
-    },
-    onFinish() {
-      top.value = positions.value[id]?.index * TRACK_HEIGHT;
-      runOnJS(setMoving)(false);
-      if (onDragComplete) {
-        runOnJS(onDragComplete)();
-      }
-    },
-  });
 
-  const animatedStyles = useAnimatedStyle(
-    () => ({
-      top: top.value,
-      zIndex: moving ? 1 : 0,
-    }),
-    [moving],
-  );
+        if (newPosition !== positions.value[id]?.index) {
+          positions.value = objectMove(
+            positions.value,
+            positions.value[id]?.index,
+            newPosition,
+          );
+        }
+      },
+      onFinish() {
+        top.value = positions.value[id]?.index * TRACK_HEIGHT;
+        runOnJS(setMoving)(false);
+        if (onDragComplete) {
+          runOnJS(onDragComplete)();
+        }
+      },
+    });
 
-  const DragAreaComponent = (
-    <PanGestureHandler onGestureEvent={gestureHandler}>
-      <Animated.View style={styles.dragAreaComponent}>
-        <Icon
-          type="Material"
-          name="drag-handle"
-          size={35}
-          color={getColors(theme, Colors.label)}
+    const animatedStyles = useAnimatedStyle(
+      () => ({
+        top: top.value,
+        zIndex: moving ? 1 : 0,
+      }),
+      [moving],
+    );
+
+    const DragAreaComponent = (
+      <PanGestureHandler onGestureEvent={gestureHandler}>
+        <Animated.View style={styles.dragAreaComponent}>
+          <Icon
+            type="Material"
+            name="drag-handle"
+            size={35}
+            color={getColors(theme, Colors.label)}
+          />
+        </Animated.View>
+      </PanGestureHandler>
+    );
+
+    return (
+      <Animated.View
+        style={[
+          animatedStyles,
+          styles.animatedItem,
+          {
+            backgroundColor: getColors(theme, Colors.background),
+          },
+        ]}>
+        <ListItem
+          isDragActive={isDragActive}
+          DragAreaComponent={DragAreaComponent}
+          track={track}
+          isLast={isDragActive ? true : index === dataLength - 1}
+          withSweapable={withSweapable}
         />
       </Animated.View>
-    </PanGestureHandler>
-  );
-
-  return (
-    <Animated.View
-      style={[
-        animatedStyles,
-        styles.animatedItem,
-        {
-          backgroundColor: getColors(theme, Colors.background),
-        },
-      ]}>
-      <ListItem
-        isDragActive={isDragActive}
-        DragAreaComponent={DragAreaComponent}
-        track={track}
-        isLast={isDragActive ? true : index === dataLength - 1}
-        withSweapable={withSweapable}
-      />
-    </Animated.View>
-  );
-};
+    );
+  },
+);

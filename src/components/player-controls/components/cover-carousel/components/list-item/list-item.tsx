@@ -1,10 +1,11 @@
-import React, {FC, useContext, useMemo, useRef} from 'react';
+import React, {useMemo, useRef} from 'react';
 import {Image, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {useUpdateEffect} from 'react-use';
 import {runOnJS} from 'react-native-reanimated';
 
+import {withTheme} from '../../../../../../hocs/with-theme';
 import {TrackType} from '../../../../../../data/types';
 import {LikeAnimation} from '../../../like-animation';
 import {
@@ -14,8 +15,6 @@ import {
 import {favouritesListState} from '../../../../../../state-management';
 import {zoomOutAnimation} from '../../../../../../utils/animation';
 import {Colors, getColors} from '../../../../../../style/colors';
-import {ThemeContext} from '../../../../../../context/theme-context/theme-context';
-import {ThemeContextType} from '../../../../../../context/theme-context/theme-context.types';
 
 import {styles} from './list-item.styles';
 
@@ -24,9 +23,8 @@ type Props = {
   favouritesHandler: (isLiked: boolean) => void;
 };
 
-export const ListItem: FC<Props> = appObserver(
-  ({favouritesHandler, trackInfo}) => {
-    const {theme} = useContext(ThemeContext) as ThemeContextType;
+export const ListItem = appObserver(
+  withTheme<Props>(({favouritesHandler, trackInfo, theme}) => {
     const animationRef = useRef<
       Animatable.View &
         View & {
@@ -69,5 +67,5 @@ export const ListItem: FC<Props> = appObserver(
         </Animatable.View>
       </GestureDetector>
     );
-  },
+  }),
 );

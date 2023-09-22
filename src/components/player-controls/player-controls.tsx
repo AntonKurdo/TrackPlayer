@@ -1,12 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-  FC,
-  useRef,
-  useMemo,
-  useContext,
-} from 'react';
+import React, {useCallback, useEffect, useState, useRef, useMemo} from 'react';
 import {
   FlatList,
   Text,
@@ -22,8 +14,6 @@ import TrackPlayer, {
 } from 'react-native-track-player';
 import * as Animatable from 'react-native-animatable';
 
-import {ThemeContext} from '../../context/theme-context/theme-context';
-import {ThemeContextType} from '../../context/theme-context/theme-context.types';
 import {TrackType} from '../../data/types';
 import {Colors, getColors} from '../../style/colors';
 import {IconButton} from '../icon-button';
@@ -35,6 +25,7 @@ import {favouritesListState} from '../../state-management';
 import {zoomOutAnimation} from '../../utils/animation';
 import {CoverCarousel} from './components/cover-carousel';
 import {Storage} from '../../services/storage';
+import {withTheme} from '../../hocs/with-theme';
 
 import {styles} from './player-controls.styles';
 
@@ -43,9 +34,8 @@ type PlayerControlsType = {
   onClose: () => void;
 };
 
-export const PlayerControls: FC<PlayerControlsType> = appObserver(
-  ({isVisible, onClose}) => {
-    const {theme} = useContext(ThemeContext) as ThemeContextType;
+export const PlayerControls = appObserver(
+  withTheme<PlayerControlsType>(({isVisible, onClose, theme}) => {
     const coversListRef = useRef<FlatList<TrackType>>(null);
     const currentCoverIndex = useRef<number | null>(null);
     const likeRef = useRef<
@@ -356,5 +346,5 @@ export const PlayerControls: FC<PlayerControlsType> = appObserver(
         )}
       </View>
     );
-  },
+  }),
 );
