@@ -1,16 +1,17 @@
 import React from 'react';
 import {View} from 'react-native';
-import LottieView from 'lottie-react-native';
+
+import {LottieViewComponent} from '../lottie-view-component';
 
 import {styles} from './empty-list.styles';
 
 export const EmptyList = () => {
   return (
     <View style={styles.container}>
-      <LottieView
-        style={styles.iconStyles}
-        source={require('../../assets/lottie-animations/empty.json')}
+      <LottieViewComponent
         autoPlay
+        source={require('../../assets/lottie-animations/empty.json')}
+        style={styles.iconStyles}
       />
     </View>
   );
