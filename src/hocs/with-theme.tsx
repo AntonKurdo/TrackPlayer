@@ -6,9 +6,9 @@ import {ThemeContextType} from '../context/theme-context/theme-context.types';
 export function withTheme<P>(
   WrappedComponent: React.ComponentType<P & ThemeContextType>,
 ) {
-  return (props: P) => {
+  return (componentProps: P) => {
     const themeProps = useContext(ThemeContext) as ThemeContextType;
 
-    return <WrappedComponent {...themeProps} {...props} />;
+    return <WrappedComponent {...themeProps} {...componentProps} />;
   };
 }
